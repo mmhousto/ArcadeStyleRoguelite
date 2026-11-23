@@ -40,12 +40,16 @@ namespace Com.MMsGamingCo.Ricomet
         {
             RunManager.trickPerformed += ShowPopup;
             WaveDirector.waveStarted += OnWaveStarted;
+            WaveDirector.bossIncoming += OnBossIncoming;
+            PrismBoss.phaseChanged += OnBossPhaseChanged;
         }
 
         private void OnDisable()
         {
             RunManager.trickPerformed -= ShowPopup;
             WaveDirector.waveStarted -= OnWaveStarted;
+            WaveDirector.bossIncoming -= OnBossIncoming;
+            PrismBoss.phaseChanged -= OnBossPhaseChanged;
         }
 
         private void Update()
@@ -112,6 +116,7 @@ namespace Com.MMsGamingCo.Ricomet
             DrawScore(run, width, top);
             DrawWaveInfo(run, right, top);
             DrawUpgrades(run, right, safe.yMax - 30f);
+            DrawBossBar(width, safe.yMax);
             DrawPopups(width, top);
             DrawBanner(width);
 
@@ -161,7 +166,12 @@ namespace Com.MMsGamingCo.Ricomet
             WaveDirector director = WaveDirector.Instance;
             GUI.color = new Color(1f, 1f, 1f, 0.8f);
 
-            if (director != null)
+            if (director != null && director.IsBossFight)
+            {
+                GUI.color = new Color(1f, 0.18f, 0.6f);
+                GUI.Label(new Rect(right - 500f, top, 500f, 50f), "BOSS", RightAligned(labelStyle));
+            }
+            else if (director != null)
             {
                 string wave = director.IsEndless
                     ? "Wave " + director.WaveNumber + "  ENDLESS"
@@ -191,6 +201,30 @@ namespace Com.MMsGamingCo.Ricomet
             }
         }
 
+        private void DrawBossBar(float width, float bottom)
+        {
+            PrismBoss boss = PrismBoss.Current;
+            if (boss == null || !boss.IsAlive) return;
+
+            float barWidth = Mathf.Min(900f, width * 0.5f);
+            Rect back = new Rect((width - barWidth) * 0.5f, bottom - 70f, barWidth, 22f);
+
+            GUI.color = new Color(1f, 1f, 1f, 0.12f);
+            GUI.DrawTexture(back, Texture2D.whiteTexture);
+
+            Color fill = boss.IsInvulnerable ? new Color(1f, 1f, 1f, 0.5f) : new Color(1f, 0.18f, 0.6f);
+            GUI.color = fill;
+            GUI.DrawTexture(new Rect(back.x, back.y, back.width * boss.HealthFraction, back.height), Texture2D.whiteTexture);
+
+            // Ticks where the phases change.
+            GUI.color = new Color(0f, 0f, 0f, 0.8f);
+            foreach (float threshold in PrismBoss.PhaseThresholds)
+                GUI.DrawTexture(new Rect(back.x + back.width * threshold - 2f, back.y, 4f, back.height), Texture2D.whiteTexture);
+
+            GUI.color = Color.white;
+            GUI.Label(new Rect(back.x, back.y - 46f, back.width, 44f), boss.DisplayName + "   PHASE " + (boss.Phase + 1), Centered(smallStyle));
+        }
+
         private void DrawPopups(float width, float top)
         {
             for (int i = 0; i < popups.Count; i++)
@@ -205,7 +239,8 @@ namespace Com.MMsGamingCo.Ricomet
             if (bannerTimer <= 0f) return;
 
             float alpha = Mathf.Clamp01(bannerTimer / 0.4f);
-            GUI.color = new Color(0f, 0.94f, 1f, alpha);
+            bool danger = bannerText == "WARNING" || bannerText.StartsWith("PHASE");
+            GUI.color = danger ? new Color(1f, 0.42f, 0f, alpha) : new Color(0f, 0.94f, 1f, alpha);
             GUI.Label(new Rect(0f, 380f, width, 130f), bannerText, bigStyle);
             GUI.color = new Color(1f, 1f, 1f, alpha * 0.8f);
             GUI.Label(new Rect(0f, 510f, width, 60f), bannerSubText, Centered(labelStyle));
@@ -276,6 +311,20 @@ namespace Com.MMsGamingCo.Ricomet
             bannerText = "WAVE " + waveNumber;
             bannerSubText = endless ? "Endless" : finalWave ? "Final wave" : (director != null ? director.Sector.displayName : "");
             bannerTimer = BannerTime;
+        }
+
+        private void OnBossIncoming()
+        {
+            bannerText = "WARNING";
+            bannerSubText = "Prism approaching. Dash through the gaps in its shield.";
+            bannerTimer = 2.2f;
+        }
+
+        private void OnBossPhaseChanged(int phase)
+        {
+            bannerText = "PHASE " + phase;
+            bannerSubText = phase == 3 ? "Final phase" : "";
+            bannerTimer = 1.4f;
         }
 
         private void ShowPopup(string text)

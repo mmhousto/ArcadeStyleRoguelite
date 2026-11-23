@@ -1,7 +1,7 @@
-# Ricomet Prototype (v0.2)
+# Ricomet Prototype (v0.3)
 
-Gray-box prototype. v0.1 asked **is dashing fun?** v0.2 adds the roguelite run loop:
-waves, upgrades between waves, and a sector to clear.
+Gray-box prototype. v0.1 asked **is dashing fun?** v0.2 added the roguelite run loop
+(waves and upgrades). v0.3 adds the Sector 1 boss, the Prism.
 Everything is built from code at runtime: no prefabs, no art, no UI assets.
 
 ## Run it
@@ -33,8 +33,22 @@ Taking a hit pushes enemies further away. Tune both under **Knockback** in `Prot
 1. Four waves: Drifters only, then Darts, then Splitters, then everything.
 2. Clear a wave (every enemy spawned and destroyed) for a time bonus if you beat par.
 3. Pick 1 of 3 upgrades. One free reroll per sector.
-4. After wave 4: **Sector Clear**. Keep Going starts endless waves (with an upgrade first),
-   or start a New Run. The boss arrives in 0.3.
+4. After wave 4: one more upgrade, then the **Prism** boss.
+5. Beat it for **Sector Clear**. Keep Going starts endless waves (with an upgrade first),
+   or start a New Run.
+
+## The Prism (boss)
+
+- **Core** (two spinning triangles): dash through it to damage it. Don't stop on it.
+- **Shield ring**: solid segments deflect your dash for free (no wall bounce used). Slip through
+  a gap, or bank a shot off the ring. The aim line shows deflections.
+- **Beams**: a thin flickering line warns where a beam will appear, then it sweeps. Beams and
+  orbs only hurt you when you're stopped, like everything else.
+- **Phases** at 66% and 33% (ticks on the health bar): more gaps but a faster shield that
+  changes direction, more beams, orb rings, and Darts and Splitters as minions. It flashes
+  and can't be hurt for a moment between phases.
+- Damage to bosses: dash 2, Shockwave 1, other effects 0.5. Health 24, so about 12 dashes.
+  Tune it on the Prism object in the Inspector during Play (Health, shield radius, beam timings).
 
 ## Enemies
 
@@ -84,6 +98,8 @@ Set **Seed** on the bootstrap to a number to replay the same spawn pattern.
 - Does the landing pulse make stopping fair without making it too safe?
 - Which upgrades feel great, and which feel like nothing happened?
 - Is Sector 1 the right length (target 3-5 minutes)? Too easy / too hard?
+- Prism: are the gaps readable? Is ricocheting off the shield fun or frustrating?
+- Are the beam telegraphs long enough? Is the fight too long (24 health)?
 - Does the picker break the flow, or is it a nice breather?
 - Are the Darts readable? Is the warning long enough on a phone?
 - Where does it start to feel hectic, and is that fun or frustrating?
@@ -93,6 +109,6 @@ Set **Seed** on the bootstrap to a number to replay the same spawn pattern.
 - HUD uses IMGUI and the default font. A proper uGUI HUD comes in the vertical slice.
 - Shapes are LineRenderers. Proper vector sprites come with the art pass.
 - No audio yet.
-- No boss, shop, Sparks, menus or meta progression yet.
+- No shop, Sparks, menus or meta progression yet. Only Sector 1.
 - Upgrades and waves are defined in code (`UpgradeCatalog`, `SectorCatalog`); they move to
   ScriptableObjects when they need icons and designer tuning.

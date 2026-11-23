@@ -18,12 +18,14 @@ namespace Com.MMsGamingCo.Ricomet
         public int runsPlayed = 0;
         public int bestWave = 0;
         public int sectorsCleared = 0;
+        public int bossesDefeated = 0;
 
-        public override int CurrentSchemaVersion { get { return 2; } }
+        public override int CurrentSchemaVersion { get { return 3; } }
 
         public override void Normalize()
         {
-            // Version 1 (0.1) had no wave tracking; the new fields default to 0.
+            // Version 1 (0.1) had no wave tracking and version 2 (0.2) no boss count;
+            // the new fields default to 0, so there is nothing to convert.
             base.Normalize();
         }
     }

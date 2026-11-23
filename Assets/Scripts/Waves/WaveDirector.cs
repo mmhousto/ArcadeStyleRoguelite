@@ -19,7 +19,7 @@ namespace Com.MMsGamingCo.Ricomet
 
         public static WaveDirector Instance { get { return _instance; } }
 
-        public enum Phase { Intro, Fighting, Cleared, Picking, SectorClear, Stopped }
+        public enum Phase { Intro, Fighting, Cleared, Picking, BossIntro, Boss, SectorClear, Stopped }
 
         private class PendingSpawn
         {
@@ -41,7 +41,11 @@ namespace Com.MMsGamingCo.Ricomet
         /// <summary>Enemies still to spawn plus enemies alive.</summary>
         public int EnemiesRemaining
         {
-            get { return Mathf.Max(0, waveTotal - spawnedThisWave) + pending.Count + Enemy.Active.Count; }
+            get
+            {
+                if (IsBossFight) return pending.Count + Enemy.Active.Count;
+                return Mathf.Max(0, waveTotal - spawnedThisWave) + pending.Count + Enemy.Active.Count;
+            }
         }
 
         /// <summary>Raised with the wave number when a wave's intro starts.</summary>
@@ -58,6 +62,12 @@ namespace Com.MMsGamingCo.Ricomet
 
         public static event Action sectorCleared;
 
+        /// <summary>Raised when the boss warning starts.</summary>
+        public static event Action bossIncoming;
+
+        public bool IsBossFight { get { return CurrentPhase == Phase.BossIntro || CurrentPhase == Phase.Boss; } }
+        public bool BossDefeated { get; private set; }
+
         private PrototypeTuning tuning;
         private SeededRandom spawnRandom;
         private SeededRandom upgradeRandom;
@@ -68,6 +78,8 @@ namespace Com.MMsGamingCo.Ricomet
         private int waveTotal;
         private int spawnedThisWave;
         private int[] spawnedPerGroup;
+        private bool bossNext = false;
+        private const float BossWarningTime = 2.2f;
         private readonly List<PendingSpawn> pending = new List<PendingSpawn>();
 
         #endregion
@@ -88,11 +100,13 @@ namespace Com.MMsGamingCo.Ricomet
         private void OnEnable()
         {
             CometHealth.cometDied += Stop;
+            PrismBoss.bossDefeated += OnBossDefeated;
         }
 
         private void OnDisable()
         {
             CometHealth.cometDied -= Stop;
+            PrismBoss.bossDefeated -= OnBossDefeated;
         }
 
         private void Update()
@@ -116,6 +130,17 @@ namespace Com.MMsGamingCo.Ricomet
                     phaseTimer -= Time.deltaTime;
                     if (phaseTimer <= 0f)
                         AfterWaveCleared();
+                    break;
+
+                case Phase.BossIntro:
+                    phaseTimer -= Time.deltaTime;
+                    if (phaseTimer <= 0f)
+                        SpawnBoss();
+                    break;
+
+                case Phase.Boss:
+                    // Boss spawns its own minions; just let pending warnings resolve.
+                    UpdatePending(Time.deltaTime);
                     break;
             }
         }
@@ -145,7 +170,11 @@ namespace Com.MMsGamingCo.Ricomet
 
             SetPickingPaused(false);
             upgradeChosen?.Invoke();
-            StartWave(waveIndex + 1);
+
+            if (bossNext)
+                StartBossIntro();
+            else
+                StartWave(waveIndex + 1);
         }
 
         /// <summary>Rolls a new offer if a reroll is left.</summary>
@@ -169,10 +198,58 @@ namespace Com.MMsGamingCo.Ricomet
             OfferUpgrades();
         }
 
+        /// <summary>Spawns an enemy after a warning ring. Used by waves and by bosses calling in minions.</summary>
+        public void SpawnWithWarning(string enemyId)
+        {
+            if (CurrentPhase == Phase.Stopped || CurrentPhase == Phase.SectorClear) return;
+            QueueSpawn(enemyId);
+        }
+
         #endregion
 
 
         #region Private Methods
+
+        private void StartBossIntro()
+        {
+            bossNext = false;
+            CurrentPhase = Phase.BossIntro;
+            phaseTimer = BossWarningTime;
+            bossIncoming?.Invoke();
+        }
+
+        private void SpawnBoss()
+        {
+            CurrentPhase = Phase.Boss;
+
+            // Appear on the far side of the arena from the comet, never on top of it.
+            Vector2 comet = CometController.Instance != null ? CometController.Instance.Position : Vector2.zero;
+            float x = comet.x > 0f ? -Arena.Bounds.width * 0.22f : Arena.Bounds.width * 0.22f;
+
+            GameObject bossObject = new GameObject("Prism Boss");
+            bossObject.transform.SetParent(transform, false);
+            bossObject.transform.position = new Vector2(x, 0f);
+            bossObject.AddComponent<PrismBoss>().Begin();
+        }
+
+        private void OnBossDefeated()
+        {
+            BossDefeated = true;
+            pending.Clear();
+
+            // The boss takes its minions with it.
+            var leftovers = new List<Enemy>(Enemy.Active);
+            foreach (Enemy enemy in leftovers)
+            {
+                if (enemy is PrismBoss) continue;
+                EffectSpawner.Kill(enemy.Position, NeonColors.Enemy);
+            }
+            if (EnemyFactory.Instance != null)
+                EnemyFactory.Instance.ClearAll();
+
+            CurrentPhase = Phase.Cleared;
+            phaseTimer = 2f;
+        }
 
         private void StartWave(int index)
         {
@@ -225,6 +302,14 @@ namespace Com.MMsGamingCo.Ricomet
         private void AfterWaveCleared()
         {
             bool lastSectorWave = !IsEndless && waveIndex >= WaveCount - 1;
+            if (lastSectorWave && Sector.HasBoss && !BossDefeated)
+            {
+                // Pick an upgrade, then the boss.
+                bossNext = true;
+                OfferUpgrades();
+                return;
+            }
+
             if (lastSectorWave)
             {
                 CurrentPhase = Phase.SectorClear;
@@ -245,10 +330,11 @@ namespace Com.MMsGamingCo.Ricomet
             UpgradeInventory inventory = RunManager.Instance != null ? RunManager.Instance.Inventory : null;
             CurrentOffer = UpgradeCatalog.RollOffer(upgradeRandom, inventory, tuning.upgradeChoices);
 
-            // Everything is maxed: skip straight to the next wave.
+            // Everything is maxed: skip straight to the next wave (or the boss).
             if (CurrentOffer.Count == 0)
             {
-                StartWave(waveIndex + 1);
+                if (bossNext) StartBossIntro();
+                else StartWave(waveIndex + 1);
                 return;
             }
 

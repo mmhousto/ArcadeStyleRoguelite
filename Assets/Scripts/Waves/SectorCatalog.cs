@@ -13,10 +13,10 @@ namespace Com.MMsGamingCo.Ricomet
         private const string T = EnemyIds.Dart;
         private const string S = EnemyIds.Splitter;
 
-        /// <summary>Sector 1: teaches the dash, then Darts, then Splitters.</summary>
+        /// <summary>Sector 1: teaches the dash, then Darts, then Splitters, then the Prism.</summary>
         public static SectorDefinition Sector1()
         {
-            return new SectorDefinition("sector_1", "Sector 1: Outskirts",
+            return new SectorDefinition("sector_1", "Sector 1: Outskirts", BossIds.Prism,
                 // Wave 1: just Drifters, in loose groups. Learn to chain.
                 new WaveDefinition(20f,
                     new SpawnGroup(D, 6, 0f, 0.4f),

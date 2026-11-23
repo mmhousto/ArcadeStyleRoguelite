@@ -2,7 +2,22 @@
 
 Versions are 0.x during development; 1.0 is launch. Each version has its own `v<version>` branch.
 
-## 0.3 (in progress)
+## 0.3: Sector 1 boss
+
+- **Prism**, the Sector 1 boss, after wave 4 (with an upgrade pick first and a WARNING banner):
+  - Crystal core: dash through it to damage it (it hurts if you stop on it).
+  - Spinning shield ring with gaps. Dashes ricochet off solid segments for free (no wall
+    bounce used); the aim line previews the deflection.
+  - Sweeping laser beams with a thin telegraph first; orb rings; minion calls.
+  - 3 phases (66% / 33%): more gaps but a faster, reversing shield, more beams, orbs, Darts
+    and Splitters. Can't skip a phase in one hit; brief invulnerability between phases.
+  - Dash deals 2 damage to bosses, Shockwave 1, other effects 0.5, with a short hit cooldown.
+  - Defeat: big explosion, minions and orbs cleared, then Sector Clear.
+- Dash obstacles: anything implementing `IDashObstacle` deflects dashes (used by the shield).
+- Enemy projectiles: hurt the comet when stopped, smashed by dashes.
+- HUD: boss health bar with phase ticks, phase banners.
+- Save tracks bosses defeated (schema version 3).
+- Tests for shield ricochet math, phase thresholds and boss damage.
 
 - Stopping is less punishing: when a dash ends, a landing pulse knocks back and briefly stuns
   nearby enemies (stunned enemies can't move or hurt you). A Dart that is winding up or

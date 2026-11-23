@@ -114,6 +114,9 @@ namespace Com.MMsGamingCo.Ricomet
         {
             if (!IsAlive) return;
 
+            damageTaken = AdjustDamage(damageTaken, source);
+            if (damageTaken <= 0f) return;
+
             LastDamageSource = source;
             Health -= damageTaken;
             flashTimer = 0.06f;
@@ -156,6 +159,12 @@ namespace Com.MMsGamingCo.Ricomet
 
         /// <summary>Creates the enemy's outline. Assign it to outline.</summary>
         protected abstract void BuildVisuals();
+
+        /// <summary>Lets an enemy change or ignore incoming damage. Return 0 to ignore the hit.</summary>
+        protected virtual float AdjustDamage(float amount, DamageSource source)
+        {
+            return amount;
+        }
 
         /// <summary>Called after the kill is reported, before returning to the pool.</summary>
         protected virtual void OnDied()

@@ -39,6 +39,7 @@ namespace Com.MMsGamingCo.Ricomet
             CreateChild<PlasmaTrail>("Plasma Trail");
 
             CreateChild<EnemyFactory>("Enemies").Setup(settings);
+            CreateChild<EnemyProjectiles>("Enemy Projectiles");
             CreateChild<PrototypeHUD>("HUD");
             CreateChild<UpgradePickerUI>("Upgrade Picker");
 

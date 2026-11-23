@@ -5,7 +5,7 @@ namespace Com.MMsGamingCo.Ricomet
 {
 
     /// <summary>
-    /// A sector: a run of waves in one arena, ending with a boss (from 0.3).
+    /// A sector: a run of waves in one arena, ending with a boss.
     /// </summary>
     [Serializable]
     public class SectorDefinition
@@ -14,11 +14,16 @@ namespace Com.MMsGamingCo.Ricomet
         public string id;
         public string displayName;
         public List<WaveDefinition> waves = new List<WaveDefinition>();
+        [UnityEngine.Tooltip("Boss fought after the last wave. Empty = no boss.")]
+        public string bossId;
 
-        public SectorDefinition(string id, string displayName, params WaveDefinition[] sectorWaves)
+        public bool HasBoss { get { return !string.IsNullOrEmpty(bossId); } }
+
+        public SectorDefinition(string id, string displayName, string bossId, params WaveDefinition[] sectorWaves)
         {
             this.id = id;
             this.displayName = displayName;
+            this.bossId = bossId;
             waves.AddRange(sectorWaves);
         }
     }

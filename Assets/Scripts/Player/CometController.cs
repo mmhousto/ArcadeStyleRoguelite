@@ -31,6 +31,7 @@ namespace Com.MMsGamingCo.Ricomet
 
         public bool IsDashing { get { return State == CometState.Dashing; } }
         public Vector2 Position { get { return transform.position; } }
+        public float Radius { get { return tuning.cometRadius; } }
 
         /// <summary>
         /// Blocks aiming and dashing, e.g. while the upgrade picker is open.
@@ -233,7 +234,7 @@ namespace Com.MMsGamingCo.Ricomet
             float step = Mathf.Min(Stats.dashSpeed * deltaTime, dashDistanceLeft);
             Vector2 start = Position;
 
-            bool hitWall = Geometry2D.MoveInsideBounds(start, dashDirection * step, Arena.Bounds, tuning.cometRadius, out Vector2 end, out Vector2 wallNormal);
+            bool hitSomething = DashObstacles.Cast(start, dashDirection * step, Arena.Bounds, tuning.cometRadius, out Vector2 end, out Vector2 wallNormal, out bool hitObstacle);
             float moved = (end - start).magnitude;
 
             transform.position = end;
@@ -245,7 +246,14 @@ namespace Com.MMsGamingCo.Ricomet
 
             if (State != CometState.Dashing) return;
 
-            if (hitWall)
+            if (hitObstacle)
+            {
+                // Obstacles (boss shields) always deflect and don't use up wall bounces.
+                dashDirection = Vector2.Reflect(dashDirection, wallNormal);
+                EffectSpawner.Landing(end, 0.9f);
+                ScreenShake.Add(0.12f);
+            }
+            else if (hitSomething)
             {
                 if (bouncesLeft > 0)
                 {
@@ -350,6 +358,16 @@ namespace Com.MMsGamingCo.Ricomet
             dashKills++;
             if (enemy.LastDamageSource == DamageSource.Dash && redirectsLeft > 0)
                 TryRedirect();
+        }
+
+        /// <summary>
+        /// Damage from hazards (beams, projectiles). Ignored while dashing, during the
+        /// post-dash grace period and while invulnerable. Returns true if the hit landed.
+        /// </summary>
+        public bool TryDamage()
+        {
+            if (IsDashing || graceTimer > 0f || Health.IsDead) return false;
+            return Health.TakeHit();
         }
 
         /// <summary>Knocks back and stuns every enemy within radius of the comet.</summary>
@@ -469,13 +487,20 @@ namespace Com.MMsGamingCo.Ricomet
 
             while (distanceLeft > 0.01f)
             {
-                bool hitWall = Geometry2D.MoveInsideBounds(position, direction * distanceLeft, Arena.Bounds, tuning.cometRadius, out Vector2 end, out Vector2 normal);
-                distanceLeft -= (end - position).magnitude;
+                bool hit = DashObstacles.Cast(position, direction * distanceLeft, Arena.Bounds, tuning.cometRadius, out Vector2 end, out Vector2 normal, out bool hitObstacle);
+                float moved = (end - position).magnitude;
+                distanceLeft -= moved;
                 position = end;
                 points.Add(position);
 
-                if (!hitWall || bounces <= 0) break;
-                bounces--;
+                if (!hit) break;
+                if (!hitObstacle)
+                {
+                    if (bounces <= 0) break;
+                    bounces--;
+                }
+                // Stop the preview getting stuck on tiny steps.
+                if (moved < 0.001f || points.Count > 12) break;
                 direction = Vector2.Reflect(direction, normal);
             }
 

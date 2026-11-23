@@ -32,6 +32,36 @@ namespace Com.MMsGamingCo.Ricomet
             return (ClosestPointOnSegment(a, b, center) - center).sqrMagnitude <= reach * reach;
         }
 
+        /// <summary>
+        /// Earliest point where the segment a-b crosses the circle's edge, in either
+        /// direction. t is 0 at a and 1 at b.
+        /// </summary>
+        /// <returns>False if the segment never crosses the edge.</returns>
+        public static bool SegmentCrossesCircle(Vector2 a, Vector2 b, Vector2 center, float radius, out float t)
+        {
+            t = 0f;
+            Vector2 d = b - a;
+            Vector2 f = a - center;
+
+            float qa = Vector2.Dot(d, d);
+            if (qa < 0.0000001f) return false;
+
+            float qb = 2f * Vector2.Dot(f, d);
+            float qc = Vector2.Dot(f, f) - radius * radius;
+            float discriminant = qb * qb - 4f * qa * qc;
+            if (discriminant < 0f) return false;
+
+            float root = Mathf.Sqrt(discriminant);
+            float t1 = (-qb - root) / (2f * qa);
+            float t2 = (-qb + root) / (2f * qa);
+
+            // Ignore a crossing exactly at the start, so something resting on the edge can leave.
+            const float Epsilon = 0.0001f;
+            if (t1 > Epsilon && t1 <= 1f) { t = t1; return true; }
+            if (t2 > Epsilon && t2 <= 1f) { t = t2; return true; }
+            return false;
+        }
+
         public static bool CirclesOverlap(Vector2 a, float radiusA, Vector2 b, float radiusB)
         {
             float reach = radiusA + radiusB;

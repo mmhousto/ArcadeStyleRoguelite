@@ -11,9 +11,12 @@ public class WaveTests
     };
 
     [Test]
-    public void Sector1HasFourWaves()
+    public void Sector1HasFourWavesAndTheBoss()
     {
-        Assert.AreEqual(4, SectorCatalog.Sector1().waves.Count);
+        SectorDefinition sector = SectorCatalog.Sector1();
+        Assert.AreEqual(4, sector.waves.Count);
+        Assert.IsTrue(sector.HasBoss);
+        Assert.AreEqual("boss_prism", sector.bossId);
     }
 
     [Test]
