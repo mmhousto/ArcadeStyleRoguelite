@@ -43,10 +43,12 @@ namespace Com.MMsGamingCo.Ricomet
             Refund(RegenPerSecond * deltaTime);
         }
 
+        /// <summary>Changes the maximum. Raising it also adds the new charges.</summary>
         public void SetMax(float max)
         {
+            float gained = Mathf.Max(0f, max - Max);
             Max = Mathf.Max(1f, max);
-            Current = Mathf.Min(Current, Max);
+            Current = Mathf.Min(Max, Current + gained);
         }
     }
 

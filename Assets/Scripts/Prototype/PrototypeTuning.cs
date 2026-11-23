@@ -89,21 +89,31 @@ namespace Com.MMsGamingCo.Ricomet
         public float damageShake = 0.6f;
 
         [Header("Spawning")]
-        public float startSpawnInterval = 1.4f;
-        public float endSpawnInterval = 0.45f;
-        [Tooltip("Seconds to ramp from start to end interval.")]
-        public float rampSeconds = 180f;
+        [Tooltip("Spawns wait while this many enemies are alive.")]
         public int maxAliveEnemies = 45;
-        [Tooltip("Dart spawn chance at the end of the ramp. Starts at 0.")]
-        [Range(0f, 1f)] public float maxDartChance = 0.35f;
-        [Tooltip("Seconds before the first Dart can spawn.")]
-        public float dartUnlockTime = 20f;
         public float spawnWarningTime = 0.7f;
         public float minSpawnDistanceFromComet = 6f;
 
         [Header("Drifter")]
         public float drifterSpeed = 2.4f;
         public float drifterRadius = 0.5f;
+
+        [Header("Splitter")]
+        public float splitterSpeed = 1.5f;
+        public float splitterRadius = 0.7f;
+        [Tooltip("Speed multiplier for the small Drifters a Splitter bursts into.")]
+        public float splitterShardSpeed = 1.6f;
+
+        [Header("Waves")]
+        [Tooltip("Seconds the wave banner shows before enemies spawn.")]
+        public float waveIntroTime = 1.4f;
+        [Tooltip("Pause after the last enemy dies before the upgrade picker opens.")]
+        public float waveClearDelay = 0.8f;
+        [Tooltip("Points per second under par time when a wave is cleared.")]
+        public int timeBonusPerSecond = 50;
+        public int upgradeChoices = 3;
+        [Tooltip("Free rerolls of the upgrade offer per sector.")]
+        public int rerollsPerSector = 1;
 
         [Header("Dart")]
         public float dartApproachSpeed = 1.6f;

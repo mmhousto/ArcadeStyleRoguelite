@@ -1,6 +1,7 @@
-# Ricomet Prototype (v0.1)
+# Ricomet Prototype (v0.2)
 
-Gray-box prototype for milestone M0. Its only job is to answer: **is dashing fun?**
+Gray-box prototype. v0.1 asked **is dashing fun?** v0.2 adds the roguelite run loop:
+waves, upgrades between waves, and a sector to clear.
 Everything is built from code at runtime: no prefabs, no art, no UI assets.
 
 ## Run it
@@ -13,27 +14,51 @@ To try it on an iPhone, build for iOS as normal; the prototype scene is the firs
 
 ## Controls
 
-| | Touch / mouse | Gamepad |
-|---|---|---|
-| Aim | Press anywhere and drag back (slingshot) | Left stick points where you'll go |
-| Dash | Release | A or RT |
-| Cancel | Drag back to where you started, then release | Let go of the stick |
-| Restart after game over | Tap / click | A or Start (or Space / Enter) |
+| | Touch / mouse | Gamepad | Keyboard |
+|---|---|---|---|
+| Aim | Press anywhere and drag back (slingshot) | Left stick points where you'll go | (mouse) |
+| Dash | Release | A or RT | (mouse) |
+| Cancel | Drag back to where you started, then release | Let go of the stick | |
+| Pick upgrade | Tap a card | D-pad + A | 1 / 2 / 3, or arrows + Enter |
+| Reroll | Tap Reroll | X or Y | R |
+| End screen | Tap a button | A = main button, X/Y = New Run | Enter / R |
 
-Keyboard debug toggles: **B** turns wall bouncing on/off, **F** turns the Focus limit on/off.
+Debug keys: **B** toggles a base wall bounce (on top of Rebound), **F** toggles the Focus limit.
 
-## What's in it
+## The run (Sector 1)
 
-- Comet with 3 dash charges (pips above it), kill refunds, slow regen while stopped.
-- Slow motion while aiming, limited by the Focus ring (yellow arc).
-- Invulnerable while dashing, vulnerable while stopped; 3 shields (top left).
-- Dash hits are swept along the path, so fast dashes never skip enemies.
-- Drifter (triangle): drifts toward you.
-- Dart (arrow): stops, shows an orange line, then charges. Faded and harmless while recovering.
-- Endless spawning that ramps up over 3 minutes, with warning rings before each spawn.
-- Combo multiplier, multi-kill bonuses (3+ kills in one dash), combo milestone popups.
-- Hit stop, screen shake, kill bursts, landing rings, bloom.
-- Best score, best combo and best time saved locally (Core `SaveSystem`, slot `prototype`).
+1. Four waves: Drifters only, then Darts, then Splitters, then everything.
+2. Clear a wave (every enemy spawned and destroyed) for a time bonus if you beat par.
+3. Pick 1 of 3 upgrades. One free reroll per sector.
+4. After wave 4: **Sector Clear**. Keep Going starts endless waves (with an upgrade first),
+   or start a New Run. The boss arrives in 0.3.
+
+## Enemies
+
+- **Drifter** (triangle): drifts toward you.
+- **Dart** (arrow): stops, shows an orange line, then charges. Faded and harmless while recovering.
+- **Splitter** (hexagon): slow, takes 2 hits, bursts into 2 small fast Drifters.
+
+## Upgrades (12)
+
+| Upgrade | Rarity | Effect | Max |
+|---|---|---|---|
+| Rebound | Common | Bounce off walls, +1 bounce per stack | 3 |
+| Seeker | Rare | Kills redirect your dash at the nearest enemy | 3 |
+| Shockwave | Common | Landing blasts nearby enemies; radius grows | 3 |
+| Plasma Trail | Rare | Dash leaves a trail that destroys enemies | 3 |
+| Arc | Rare | Direct kills zap nearby enemies, +1 target per stack | 3 |
+| Shatter | Epic | Direct kills burst into fragments | 2 |
+| Reserve | Common | +1 dash charge | 2 |
+| Siphon | Common | +0.1 kill refund | 3 |
+| Clarity | Common | +50% Focus, faster charge regen | 2 |
+| Overdrive | Common | Dash 20% faster and 15% farther | 3 |
+| Bulwark | Rare | +1 max shield (and repair it) | 2 |
+| Phase | Rare | Invulnerable briefly after each dash | 2 |
+
+Arc and Shatter only trigger from dash and Shockwave kills, so chains can't loop forever.
+Upgrade offers and spawns use separate seeded random streams: the same seed always gives the
+same spawns, whatever upgrades you take.
 
 ## Tuning
 
@@ -54,6 +79,9 @@ Set **Seed** on the bootstrap to a number to replay the same spawn pattern.
 - Does the kill refund (0.35) keep you moving when you play well and punish misses enough?
 - Is stopping dangerous enough? Too punishing?
 - Does wall bounce (B) feel like it should be a base mechanic or an upgrade?
+- Which upgrades feel great, and which feel like nothing happened?
+- Is Sector 1 the right length (target 3-5 minutes)? Too easy / too hard?
+- Does the picker break the flow, or is it a nice breather?
 - Are the Darts readable? Is the warning long enough on a phone?
 - Where does it start to feel hectic, and is that fun or frustrating?
 
@@ -62,4 +90,6 @@ Set **Seed** on the bootstrap to a number to replay the same spawn pattern.
 - HUD uses IMGUI and the default font. A proper uGUI HUD comes in the vertical slice.
 - Shapes are LineRenderers. Proper vector sprites come with the art pass.
 - No audio yet.
-- No upgrades, waves, bosses or menus yet (milestone M1).
+- No boss, shop, Sparks, menus or meta progression yet.
+- Upgrades and waves are defined in code (`UpgradeCatalog`, `SectorCatalog`); they move to
+  ScriptableObjects when they need icons and designer tuning.

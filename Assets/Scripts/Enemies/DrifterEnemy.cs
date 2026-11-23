@@ -8,13 +8,19 @@ namespace Com.MMsGamingCo.Ricomet
     /// </summary>
     public class DrifterEnemy : Enemy
     {
+        [Tooltip("Size multiplier. Splitter shards are small, fast Drifters.")]
+        public float sizeScale = 1f;
+        [Tooltip("Speed multiplier.")]
+        public float speedScale = 1f;
+
         private float wobbleOffset;
         private float spin;
 
         protected override void BuildVisuals()
         {
-            enemyId = "enemy_drifter";
-            radius = tuning.drifterRadius;
+            enemyId = sizeScale < 1f ? "enemy_drifter_mini" : "enemy_drifter";
+            radius = tuning.drifterRadius * sizeScale;
+            points = sizeScale < 1f ? 50 : 100;
             outline = ShapeFactory.CreatePolygon(transform, "Outline", ShapeFactory.Triangle(radius * 1.2f), NeonColors.Enemy, 0.09f, 6);
         }
 
@@ -34,7 +40,7 @@ namespace Com.MMsGamingCo.Ricomet
             Vector2 side = new Vector2(-direction.y, direction.x);
             float wobble = Mathf.Sin(Time.time * 2.5f + wobbleOffset) * 0.35f;
 
-            Vector2 velocity = (direction + side * wobble + Separation(1.2f) * 1.5f) * tuning.drifterSpeed;
+            Vector2 velocity = (direction + side * wobble + Separation(1.2f) * 1.5f) * tuning.drifterSpeed * speedScale;
             transform.position = Position + velocity * deltaTime;
 
             outline.transform.Rotate(0f, 0f, spin * deltaTime);

@@ -50,6 +50,15 @@ namespace Com.MMsGamingCo.Ricomet
             return true;
         }
 
+        /// <summary>Changes max shields. Raising it also repairs the new shields.</summary>
+        public void SetMaxShields(int maxShields)
+        {
+            int gained = Mathf.Max(0, maxShields - MaxShields);
+            MaxShields = Mathf.Max(1, maxShields);
+            if (!IsDead)
+                Shields = Mathf.Min(MaxShields, Shields + gained);
+        }
+
         public void RestoreShield()
         {
             if (!IsDead)

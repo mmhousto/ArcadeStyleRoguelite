@@ -23,6 +23,14 @@ namespace Com.MMsGamingCo.Ricomet
             RefillPerSecond = refillPerSecond;
         }
 
+        /// <summary>Changes the maximum. Raising it also adds the difference.</summary>
+        public void SetMax(float maxSeconds)
+        {
+            float gained = Mathf.Max(0f, maxSeconds - Max);
+            Max = Mathf.Max(0.1f, maxSeconds);
+            Current = Mathf.Min(Max, Current + gained);
+        }
+
         public void Drain(float realDeltaTime)
         {
             Current = Mathf.Max(0f, Current - realDeltaTime);

@@ -16,6 +16,7 @@ namespace Com.MMsGamingCo.Ricomet
         public int prewarmCount = 20;
 
         private readonly List<BurstEffect> bursts = new List<BurstEffect>();
+        private readonly List<LightningEffect> bolts = new List<LightningEffect>();
 
         private void Awake()
         {
@@ -50,6 +51,20 @@ namespace Com.MMsGamingCo.Ricomet
                 _instance.GetBurst().Play(position, color, 1.4f, 0.3f, seconds, false, true);
         }
 
+        /// <summary>Shockwave upgrade: a fast ring out to the blast radius.</summary>
+        public static void Shockwave(Vector2 position, float radius)
+        {
+            if (_instance != null)
+                _instance.GetBurst().Play(position, NeonColors.Player, 0.3f, radius, 0.3f, true);
+        }
+
+        /// <summary>Jagged bolt between two points.</summary>
+        public static void Lightning(Vector2 from, Vector2 to, Color color)
+        {
+            if (_instance != null)
+                _instance.GetBolt().Play(from, to, color);
+        }
+
         /// <summary>Big burst when the comet takes damage.</summary>
         public static void Damage(Vector2 position)
         {
@@ -64,6 +79,21 @@ namespace Com.MMsGamingCo.Ricomet
                 if (!burst.IsPlaying) return burst;
             }
             return CreateBurst();
+        }
+
+        private LightningEffect GetBolt()
+        {
+            foreach (LightningEffect bolt in bolts)
+            {
+                if (!bolt.IsPlaying) return bolt;
+            }
+
+            GameObject boltObject = new GameObject("Bolt");
+            boltObject.transform.SetParent(transform, false);
+            LightningEffect created = boltObject.AddComponent<LightningEffect>();
+            boltObject.SetActive(false);
+            bolts.Add(created);
+            return created;
         }
 
         private BurstEffect CreateBurst()

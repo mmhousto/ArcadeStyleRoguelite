@@ -32,6 +32,9 @@ namespace Com.MMsGamingCo.Ricomet
 
         public float Health { get; private set; }
         public bool IsAlive { get; private set; }
+
+        /// <summary>What dealt the last hit. Read it in enemyKilled to see what killed the enemy.</summary>
+        public DamageSource LastDamageSource { get; private set; }
         public float Radius { get { return radius; } }
         public Vector2 Position { get { return transform.position; } }
 
@@ -86,8 +89,14 @@ namespace Com.MMsGamingCo.Ricomet
 
         public void Damage(float damageTaken)
         {
+            Damage(damageTaken, DamageSource.Dash);
+        }
+
+        public void Damage(float damageTaken, DamageSource source)
+        {
             if (!IsAlive) return;
 
+            LastDamageSource = source;
             Health -= damageTaken;
             flashTimer = 0.06f;
 
@@ -118,6 +127,11 @@ namespace Com.MMsGamingCo.Ricomet
 
         /// <summary>Creates the enemy's outline. Assign it to outline.</summary>
         protected abstract void BuildVisuals();
+
+        /// <summary>Called after the kill is reported, before returning to the pool.</summary>
+        protected virtual void OnDied()
+        {
+        }
 
         protected virtual Color BaseColor()
         {
@@ -168,6 +182,7 @@ namespace Com.MMsGamingCo.Ricomet
                 TimeController.Instance.HitStop(tuning.hitStopSeconds);
 
             enemyKilled?.Invoke(this);
+            OnDied();
 
             if (pooledObject != null)
                 pooledObject.ReturnToPool();

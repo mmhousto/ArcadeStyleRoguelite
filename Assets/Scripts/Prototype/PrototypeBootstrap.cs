@@ -5,8 +5,8 @@ namespace Com.MMsGamingCo.Ricomet
 {
 
     /// <summary>
-    /// Builds the whole gray-box prototype from code: camera, arena, comet, spawner
-    /// and HUD. Put this on one empty GameObject in a scene and press Play.
+    /// Builds the whole gray-box prototype from code: camera, arena, comet, waves,
+    /// upgrades and HUD. Put this on one empty GameObject in a scene and press Play.
     /// </summary>
     public class PrototypeBootstrap : MonoBehaviour
     {
@@ -23,7 +23,7 @@ namespace Com.MMsGamingCo.Ricomet
         {
             PrototypeTuning.Use(tuning);
             PrototypeTuning settings = PrototypeTuning.Instance;
-            SeededRandom random = new SeededRandom(seed != 0 ? seed : SeededRandom.NewSeed());
+            int runSeed = seed != 0 ? seed : SeededRandom.NewSeed();
 
             Application.targetFrameRate = PreferencesManager.GetTargetFrameRate();
 
@@ -31,12 +31,22 @@ namespace Com.MMsGamingCo.Ricomet
             SetupCamera(settings);
             CreateChild<Arena>("Arena").Build(settings.arenaSize);
             CreateChild<EffectSpawner>("Effects");
-            CreateChild<RunManager>("Run Manager").Setup(settings);
+            CreateChild<RunManager>("Run Manager").Setup(settings, runSeed);
             CreateChild<CometController>("Comet").Setup(settings);
-            CreateChild<EnemySpawner>("Enemy Spawner").Setup(settings, random);
-            CreateChild<PrototypeHUD>("HUD");
 
-            Debug.Log("Ricomet prototype started. Seed " + random.Seed);
+            // Effects live on their own objects so they don't move with the comet.
+            CreateChild<CometAbilities>("Comet Abilities");
+            CreateChild<PlasmaTrail>("Plasma Trail");
+
+            CreateChild<EnemyFactory>("Enemies").Setup(settings);
+            CreateChild<PrototypeHUD>("HUD");
+            CreateChild<UpgradePickerUI>("Upgrade Picker");
+
+            // Separate random streams, so taking different upgrades never changes the spawns.
+            CreateChild<WaveDirector>("Wave Director").Setup(settings, SectorCatalog.Sector1(),
+                new SeededRandom(runSeed), new SeededRandom(runSeed + 1));
+
+            Debug.Log("Ricomet prototype started. Seed " + runSeed);
         }
 
         private void SetupCamera(PrototypeTuning settings)
