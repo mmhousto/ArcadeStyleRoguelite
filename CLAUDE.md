@@ -1,14 +1,23 @@
-# ArcadeStyleRoguelite
+# Ricomet
 
-Unity 6 (6000.3) URP project, iOS first. Arcade-style roguelite.
+Unity 6 (6000.3) URP project, iOS first, landscape, Steam port later. Arcade-style roguelite
+(working title Ricomet: ricochet + comet). Repository name: ArcadeStyleRoguelite.
 
 ## Layout
 
 - `Packages/com.mmsgamingco.core/`: reusable boilerplate package (audio, preferences,
   scene loading, saves, cloud save, safe area, pooling). Use it instead of rewriting
   those systems. Keep game-specific code out of it.
-- `Assets/Scripts/`: game code (namespace `Com.MMsGamingCo.Ricochet`).
+- `Assets/Scripts/`: game code (namespace `Com.MMsGamingCo.Ricomet`).
 - `Docs/GameDesign.md`: game design document. Check it before building features.
+- `Docs/Prototype.md`: how to run and tune the current prototype.
+
+## Versions and branches
+
+- Versions start at 0.1; 1.0 is launch. Each batch of changes gets its own branch named
+  `v<major>.<minor>` (e.g. `v0.1`, `v0.2`), branched from the previous version's branch.
+- Keep `bundleVersion` in ProjectSettings matching the branch (0.1 → `0.1.0`).
+- Note each version's changes in `Docs/Changelog.md`.
 
 ## Code style
 

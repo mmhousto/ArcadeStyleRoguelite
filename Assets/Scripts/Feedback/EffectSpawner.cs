@@ -1,0 +1,80 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Com.MMsGamingCo.Ricomet
+{
+
+    /// <summary>
+    /// Reuses BurstEffects instead of creating new ones for every kill.
+    /// </summary>
+    public class EffectSpawner : MonoBehaviour
+    {
+        private static EffectSpawner _instance;
+
+        public static EffectSpawner Instance { get { return _instance; } }
+
+        public int prewarmCount = 20;
+
+        private readonly List<BurstEffect> bursts = new List<BurstEffect>();
+
+        private void Awake()
+        {
+            _instance = this;
+            for (int i = 0; i < prewarmCount; i++)
+                CreateBurst();
+        }
+
+        private void OnDestroy()
+        {
+            if (_instance == this) _instance = null;
+        }
+
+        /// <summary>Kill burst: ring grows and fades, sparks fly out.</summary>
+        public static void Kill(Vector2 position, Color color)
+        {
+            if (_instance != null)
+                _instance.GetBurst().Play(position, color, 0.3f, 1.6f, 0.35f, true);
+        }
+
+        /// <summary>Small ring where the comet stops.</summary>
+        public static void Landing(Vector2 position)
+        {
+            if (_instance != null)
+                _instance.GetBurst().Play(position, NeonColors.Player, 0.4f, 1.1f, 0.25f, false);
+        }
+
+        /// <summary>Shrinking ring that warns where an enemy is about to appear.</summary>
+        public static void SpawnWarning(Vector2 position, Color color, float seconds)
+        {
+            if (_instance != null)
+                _instance.GetBurst().Play(position, color, 1.4f, 0.3f, seconds, false, true);
+        }
+
+        /// <summary>Big burst when the comet takes damage.</summary>
+        public static void Damage(Vector2 position)
+        {
+            if (_instance != null)
+                _instance.GetBurst().Play(position, NeonColors.Danger, 0.5f, 3.5f, 0.5f, true);
+        }
+
+        private BurstEffect GetBurst()
+        {
+            foreach (BurstEffect burst in bursts)
+            {
+                if (!burst.IsPlaying) return burst;
+            }
+            return CreateBurst();
+        }
+
+        private BurstEffect CreateBurst()
+        {
+            GameObject burstObject = new GameObject("Burst");
+            burstObject.transform.SetParent(transform, false);
+            BurstEffect burst = burstObject.AddComponent<BurstEffect>();
+            burstObject.SetActive(false);
+            bursts.Add(burst);
+            return burst;
+        }
+    }
+
+}

@@ -1,12 +1,12 @@
-# Ricochet: Game Design Document
+# Ricomet: Game Design Document
 
-**Working title:** Ricochet (needs a unique name before launch, see Open Questions)
+**Working title:** Ricomet (ricochet + comet). No existing game or app found with this name; still needs an App Store and trademark check.
 **Genre:** Arcade action roguelite
 **Platforms:** iOS first, then Steam (PC/Mac). Android later if it does well.
 **Orientation:** Landscape
 **Run length:** 3-8 minutes
 **Business model:** Free to play with ads and in-app purchases (mobile). Premium on Steam.
-**Version:** 0.1 (first draft)
+**Version:** 0.1 (first draft). Versions: 0.x during development, 1.0 = launch.
 
 ---
 
@@ -380,7 +380,7 @@ glowing wireframe arcade cabinet. Everything readable as a silhouette.
 - **Leaderboards / achievements:** Game Center (iOS), Steamworks.NET (Steam), behind one
   interface so game code doesn't care which platform it's on.
 
-### 12.2 Game Code Structure (`Assets/Scripts`, namespace `Com.MMsGamingCo.Ricochet`)
+### 12.2 Game Code Structure (`Assets/Scripts`, namespace `Com.MMsGamingCo.Ricomet`)
 
 | Folder | Contents |
 |---|---|
@@ -426,9 +426,9 @@ glowing wireframe arcade cabinet. Everything readable as a silhouette.
 
 ## 14. Open Questions
 
-1. **Name.** "Ricochet" is used by many existing games and apps. Some ideas: *Neon Comet*,
-   *Streakline*, *Flarebound*, *Comet Crash*, *Lumen Rush*. Check App Store and trademark
-   availability before picking.
+1. **Name.** Working title is *Ricomet*. A quick search found no game or app with this name
+   ("Neon Ricochet" and "Ricochet Rush" are already taken on the App Store). Do a full App Store
+   and trademark check before launch.
 2. Does the player get a manual ability (bomb, time stop) on a cooldown, or is the dash enough?
    Decide after the M0 prototype.
 3. Is Focus (slow motion while aiming) limited by a meter, or unlimited? Test both in M0.
