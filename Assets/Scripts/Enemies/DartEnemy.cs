@@ -80,6 +80,15 @@ namespace Com.MMsGamingCo.Ricomet
             }
         }
 
+        public override void ApplyKnockback(Vector2 velocity, float stunSeconds)
+        {
+            // A push interrupts a windup or charge: the Dart has to recover first.
+            if (IsAlive && velocity != Vector2.zero && (state == DartState.Windup || state == DartState.Charge))
+                SetState(DartState.Recover, tuning.dartRecoverTime);
+
+            base.ApplyKnockback(velocity, stunSeconds);
+        }
+
         private void SetState(DartState newState, float duration)
         {
             state = newState;

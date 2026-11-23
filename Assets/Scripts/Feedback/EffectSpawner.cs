@@ -37,11 +37,11 @@ namespace Com.MMsGamingCo.Ricomet
                 _instance.GetBurst().Play(position, color, 0.3f, 1.6f, 0.35f, true);
         }
 
-        /// <summary>Small ring where the comet stops.</summary>
-        public static void Landing(Vector2 position)
+        /// <summary>Ring where the comet stops, out to the knockback radius.</summary>
+        public static void Landing(Vector2 position, float radius)
         {
             if (_instance != null)
-                _instance.GetBurst().Play(position, NeonColors.Player, 0.4f, 1.1f, 0.25f, false);
+                _instance.GetBurst().Play(position, NeonColors.WithAlpha(NeonColors.Player, 0.7f), 0.4f, radius, 0.22f, false);
         }
 
         /// <summary>Shrinking ring that warns where an enemy is about to appear.</summary>

@@ -53,8 +53,9 @@ namespace Com.MMsGamingCo.Ricomet
         public float dashDamage = 1f;
         [Tooltip("Collision radius of the comet.")]
         public float cometRadius = 0.45f;
-        [Tooltip("Bounce off walls instead of stopping. An upgrade in the full game; on here to test feel.")]
-        public bool bounceOffWalls = false;
+        [Tooltip("Bounce off walls instead of stopping. Standard; Rebound adds more bounces.")]
+        public bool bounceOffWalls = true;
+        [Tooltip("Wall bounces every dash gets before upgrades.")]
         public int maxWallBounces = 1;
 
         [Header("Energy")]
@@ -75,7 +76,20 @@ namespace Com.MMsGamingCo.Ricomet
         public int maxShields = 3;
         public float invulnerableAfterHit = 1f;
         [Tooltip("Grace period after a dash ends before contact damage applies.")]
-        public float postDashGrace = 0.12f;
+        public float postDashGrace = 0.2f;
+
+        [Header("Knockback")]
+        [Tooltip("Enemies inside this radius are pushed away when a dash ends.")]
+        public float landingPushRadius = 2.6f;
+        public float landingPushSpeed = 13f;
+        [Tooltip("Seconds pushed enemies can't move or hurt you.")]
+        public float landingStunTime = 0.35f;
+        [Tooltip("Bigger push when the comet takes a hit, to give room to escape.")]
+        public float hitPushRadius = 4.5f;
+        public float hitPushSpeed = 18f;
+        public float hitStunTime = 0.6f;
+        [Tooltip("How quickly knockback slows down. Higher = shorter slide.")]
+        public float knockbackDrag = 7f;
 
         [Header("Combo")]
         public float comboWindow = 1.5f;

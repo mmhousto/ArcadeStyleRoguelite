@@ -23,7 +23,10 @@ To try it on an iPhone, build for iOS as normal; the prototype scene is the firs
 | Reroll | Tap Reroll | X or Y | R |
 | End screen | Tap a button | A = main button, X/Y = New Run | Enter / R |
 
-Debug keys: **B** toggles a base wall bounce (on top of Rebound), **F** toggles the Focus limit.
+Debug keys: **B** toggles the standard wall bounce (on by default), **F** toggles the Focus limit.
+
+When a dash ends, a landing pulse (the ring) knocks back and briefly stuns enemies around you.
+Taking a hit pushes enemies further away. Tune both under **Knockback** in `PrototypeTuning`.
 
 ## The run (Sector 1)
 
@@ -43,7 +46,7 @@ Debug keys: **B** toggles a base wall bounce (on top of Rebound), **F** toggles 
 
 | Upgrade | Rarity | Effect | Max |
 |---|---|---|---|
-| Rebound | Common | Bounce off walls, +1 bounce per stack | 3 |
+| Rebound | Common | +1 wall bounce per dash (1 is standard) | 3 |
 | Seeker | Rare | Kills redirect your dash at the nearest enemy | 3 |
 | Shockwave | Common | Landing blasts nearby enemies; radius grows | 3 |
 | Plasma Trail | Rare | Dash leaves a trail that destroys enemies | 3 |
@@ -78,7 +81,7 @@ Set **Seed** on the bootstrap to a number to replay the same spawn pattern.
 - Is slow motion while aiming exciting, or does it slow the game down too much? Limited or unlimited Focus?
 - Does the kill refund (0.35) keep you moving when you play well and punish misses enough?
 - Is stopping dangerous enough? Too punishing?
-- Does wall bounce (B) feel like it should be a base mechanic or an upgrade?
+- Does the landing pulse make stopping fair without making it too safe?
 - Which upgrades feel great, and which feel like nothing happened?
 - Is Sector 1 the right length (target 3-5 minutes)? Too easy / too hard?
 - Does the picker break the flow, or is it a nice breather?

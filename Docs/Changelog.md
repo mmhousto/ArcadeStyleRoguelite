@@ -2,6 +2,15 @@
 
 Versions are 0.x during development; 1.0 is launch. Each version has its own `v<version>` branch.
 
+## 0.3 (in progress)
+
+- Stopping is less punishing: when a dash ends, a landing pulse knocks back and briefly stuns
+  nearby enemies (stunned enemies can't move or hurt you). A Dart that is winding up or
+  charging gets interrupted.
+- Taking a hit blasts nearby enemies further away and stuns them longer.
+- Post-dash grace period 0.12s → 0.2s.
+- Wall bounce is now standard (1 bounce). Rebound adds +1 per stack.
+
 ## 0.2: Run loop
 
 - Waves replace endless spawning. Sector 1 has 4 hand-made waves; clearing it offers endless

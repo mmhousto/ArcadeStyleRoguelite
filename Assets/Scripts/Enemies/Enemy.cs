@@ -41,9 +41,17 @@ namespace Com.MMsGamingCo.Ricomet
         /// <summary>False while an enemy is harmless (e.g. a Dart recovering). Most are always dangerous.</summary>
         public virtual bool DealsContactDamage { get { return true; } }
 
+        /// <summary>True while knocked back. Stunned enemies can't move or hurt the comet.</summary>
+        public bool IsStunned { get { return stunTimer > 0f; } }
+
+        /// <summary>Whether touching this enemy right now hurts the comet.</summary>
+        public bool CanHurtComet { get { return IsAlive && !IsStunned && DealsContactDamage; } }
+
         protected PrototypeTuning tuning;
         protected LineRenderer outline;
         private float flashTimer = 0f;
+        private float stunTimer = 0f;
+        private Vector2 knockbackVelocity = Vector2.zero;
         private PooledObject pooledObject;
 
         #endregion
@@ -72,7 +80,17 @@ namespace Com.MMsGamingCo.Ricomet
         {
             if (!IsAlive) return;
 
-            Tick(Time.deltaTime);
+            if (stunTimer > 0f)
+            {
+                // Knocked back: slide instead of acting.
+                stunTimer -= Time.deltaTime;
+                transform.position = Position + knockbackVelocity * Time.deltaTime;
+                knockbackVelocity = Knockback.Decay(knockbackVelocity, tuning.knockbackDrag, Time.deltaTime);
+            }
+            else
+            {
+                Tick(Time.deltaTime);
+            }
             transform.position = Arena.Clamp(Position, radius);
 
             if (flashTimer > 0f)
@@ -104,11 +122,22 @@ namespace Com.MMsGamingCo.Ricomet
                 Die();
         }
 
+        /// <summary>Pushes the enemy and stuns it for a moment.</summary>
+        public virtual void ApplyKnockback(Vector2 velocity, float stunSeconds)
+        {
+            if (!IsAlive || velocity == Vector2.zero) return;
+
+            knockbackVelocity = velocity;
+            stunTimer = Mathf.Max(stunTimer, stunSeconds);
+        }
+
         public virtual void OnSpawned()
         {
             Health = maxHealth;
             IsAlive = true;
             flashTimer = 0f;
+            stunTimer = 0f;
+            knockbackVelocity = Vector2.zero;
             ShapeFactory.SetColor(outline, BaseColor());
         }
 

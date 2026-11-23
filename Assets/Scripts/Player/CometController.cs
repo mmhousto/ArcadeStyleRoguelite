@@ -288,7 +288,8 @@ namespace Com.MMsGamingCo.Ricomet
             graceTimer = Mathf.Max(tuning.postDashGrace, Stats.phaseSeconds);
             trail.emitting = false;
 
-            EffectSpawner.Landing(Position);
+            EffectSpawner.Landing(Position, tuning.landingPushRadius);
+            PushEnemies(tuning.landingPushRadius, tuning.landingPushSpeed, tuning.landingStunTime);
             if (dashKills >= 3 && TimeController.Instance != null)
                 TimeController.Instance.HitStop(tuning.multiKillHitStopSeconds);
 
@@ -330,7 +331,7 @@ namespace Com.MMsGamingCo.Ricomet
 
             foreach (Enemy enemy in Enemy.Active)
             {
-                if (enemy.IsAlive && enemy.DealsContactDamage &&
+                if (enemy.CanHurtComet &&
                     Geometry2D.CirclesOverlap(Position, tuning.cometRadius, enemy.Position, enemy.Radius))
                 {
                     Health.TakeHit();
@@ -351,9 +352,21 @@ namespace Com.MMsGamingCo.Ricomet
                 TryRedirect();
         }
 
+        /// <summary>Knocks back and stuns every enemy within radius of the comet.</summary>
+        private void PushEnemies(float radius, float speed, float stunSeconds)
+        {
+            foreach (Enemy enemy in Enemy.Active)
+            {
+                Vector2 velocity = Knockback.Velocity(Position, enemy.Position, radius + enemy.Radius, speed);
+                if (velocity != Vector2.zero)
+                    enemy.ApplyKnockback(velocity, stunSeconds);
+            }
+        }
+
         private void OnDamaged(int shieldsLeft)
         {
             EffectSpawner.Damage(Position);
+            PushEnemies(tuning.hitPushRadius, tuning.hitPushSpeed, tuning.hitStunTime);
             ScreenShake.Add(tuning.damageShake);
             if (TimeController.Instance != null)
                 TimeController.Instance.HitStop(0.12f);

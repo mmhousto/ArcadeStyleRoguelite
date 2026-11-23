@@ -58,6 +58,10 @@ something ridiculous: splitting, bouncing, chaining lightning, leaving trails of
 - When standing still, charges come back slowly (1 charge every 2.5 seconds).
 - While dashing, the comet is **invulnerable** and destroys anything weak enough in its path.
 - While stopped, the comet is **vulnerable**. This is when you take damage.
+- **Landing pulse:** when a dash ends, enemies close to the comet are knocked back and stunned
+  for a moment (stunned enemies can't move or hurt you; a charging Dart is interrupted). Stopping
+  stays risky, but you're never landing directly on top of a hit.
+- **Wall bounce is standard:** every dash bounces off a wall once. Upgrades add more bounces.
 
 ### 3.3 Focus (slow motion)
 
@@ -70,7 +74,7 @@ something ridiculous: splitting, bouncing, chaining lightning, leaving trails of
 ### 3.4 Health
 
 - 3 **shields** (hearts). Getting hit while stopped costs one shield, followed by 1 second of
-  invulnerability (blinking).
+  invulnerability (blinking) and a strong knockback that clears space around the comet.
 - Lose all shields and the run ends (one revive allowed per run, see Monetization).
 - Shields can be restored by rare pickups and some upgrades.
 
@@ -135,7 +139,7 @@ Upgrades are picked during a run and lost when it ends. Each has a stable string
 - `impact_quake`: Every 3rd dash lands with a huge shockwave.
 
 **Bounce**
-- `bounce_wall`: Bounce off walls once per dash.
+- `bounce_wall`: +1 wall bounce per dash (one bounce is standard).
 - `bounce_enemy`: Kills redirect you toward the nearest enemy.
 - `bounce_extra`: +1 bounce (stacks).
 - `bounce_rubber`: Each bounce increases damage.

@@ -100,6 +100,7 @@ public class UpgradeTests
 
         Assert.AreEqual(tuning.maxCharges, stats.maxCharges);
         Assert.AreEqual(tuning.maxShields, stats.maxShields);
+        Assert.AreEqual(1, stats.wallBounces);
         Assert.AreEqual(0f, stats.shockwaveRadius);
         Assert.AreEqual(0, stats.chainTargets);
     }
@@ -116,7 +117,8 @@ public class UpgradeTests
         inventory.Add("def_shield");
 
         CometStats stats = CometStats.Build(tuning, inventory);
-        Assert.AreEqual(2, stats.wallBounces);
+        // Wall bounce is standard, so two Rebounds stack on top of the base bounce.
+        Assert.AreEqual(tuning.maxWallBounces + 2, stats.wallBounces);
         Assert.AreEqual(tuning.maxCharges + 1f, stats.maxCharges);
         Assert.AreEqual(1, stats.chainTargets);
         Assert.AreEqual(tuning.maxShields + 1, stats.maxShields);

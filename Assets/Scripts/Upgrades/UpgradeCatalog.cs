@@ -21,7 +21,7 @@ namespace Com.MMsGamingCo.Ricomet
         public static readonly UpgradeDefinition[] All =
         {
             // Bounce
-            new UpgradeDefinition("bounce_wall", "Rebound", "Bounce off walls. +1 bounce per stack.",
+            new UpgradeDefinition("bounce_wall", "Rebound", "+1 wall bounce per dash.",
                 UpgradeRarity.Common, 3, new[] { "bounce" },
                 (stats, stacks) => stats.wallBounces += stacks),
 
