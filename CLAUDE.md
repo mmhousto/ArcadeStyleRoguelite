@@ -7,7 +7,8 @@ Unity 6 (6000.3) URP project, iOS first. Arcade-style roguelite.
 - `Packages/com.mmsgamingco.core/`: reusable boilerplate package (audio, preferences,
   scene loading, saves, cloud save, safe area, pooling). Use it instead of rewriting
   those systems. Keep game-specific code out of it.
-- `Assets/Scripts/`: game code.
+- `Assets/Scripts/`: game code (namespace `Com.MMsGamingCo.Ricochet`).
+- `Docs/GameDesign.md`: game design document. Check it before building features.
 
 ## Code style
 
