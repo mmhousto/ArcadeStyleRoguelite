@@ -14,9 +14,11 @@ Unity 6 (6000.3) URP project, iOS first, landscape, Steam port later. Arcade-sty
 
 ## Versions and branches
 
-- Versions start at 0.1; 1.0 is launch. Each batch of changes gets its own branch named
-  `v<major>.<minor>` (e.g. `v0.1`, `v0.2`), branched from the previous version's branch.
-- Keep `bundleVersion` in ProjectSettings matching the branch (0.1 → `0.1.0`).
+- Day-to-day work happens on `Chad`.
+- Versions start at 0.1; 1.0 is launch. When a version's batch of changes is done, create a
+  snapshot branch `v<major>.<minor>` (e.g. `v0.2`) from `Chad` and push it. Minor fixes and
+  tweaks stay on `Chad` and don't get a new branch.
+- Bump `bundleVersion` in ProjectSettings when starting a version (0.2 → `0.2.0`).
 - Note each version's changes in `Docs/Changelog.md`.
 
 ## Code style
