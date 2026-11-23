@@ -1,0 +1,33 @@
+{
+    "name": "MorganHouston.Core.Services",
+    "rootNamespace": "Com.MorganHouston.Core.Services",
+    "references": [
+        "MorganHouston.Core",
+        "Unity.Services.Core",
+        "Unity.Services.Authentication",
+        "Unity.Services.CloudSave"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "MH_UGS_AUTH",
+        "MH_UGS_CLOUDSAVE"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.services.authentication",
+            "expression": "3.0.0",
+            "define": "MH_UGS_AUTH"
+        },
+        {
+            "name": "com.unity.services.cloudsave",
+            "expression": "3.0.0",
+            "define": "MH_UGS_CLOUDSAVE"
+        }
+    ],
+    "noEngineReferences": false
+}
