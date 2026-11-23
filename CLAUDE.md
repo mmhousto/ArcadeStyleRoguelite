@@ -4,7 +4,7 @@ Unity 6 (6000.3) URP project, iOS first. Arcade-style roguelite.
 
 ## Layout
 
-- `Packages/com.morganhouston.core/`: reusable boilerplate package (audio, preferences,
+- `Packages/com.mmsgamingco.core/`: reusable boilerplate package (audio, preferences,
   scene loading, saves, cloud save, safe area, pooling). Use it instead of rewriting
   those systems. Keep game-specific code out of it.
 - `Assets/Scripts/`: game code.

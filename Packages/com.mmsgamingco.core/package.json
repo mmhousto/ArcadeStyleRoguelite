@@ -1,10 +1,10 @@
 {
-  "name": "com.morganhouston.core",
+  "name": "com.mmsgamingco.core",
   "version": "1.0.0",
-  "displayName": "Morgan Houston Core",
+  "displayName": "MMs Gaming Co Core",
   "description": "Reusable boilerplate for Unity projects: singletons, audio, preferences, scene loading, local and cloud saves, safe area UI and object pooling.",
   "unity": "6000.0",
-  "documentationUrl": "https://github.com/mmhousto/ArcadeStyleRoguelite/tree/Chad/Packages/com.morganhouston.core",
+  "documentationUrl": "https://github.com/mmhousto/ArcadeStyleRoguelite/tree/Chad/Packages/com.mmsgamingco.core",
   "dependencies": {
     "com.unity.ugui": "2.0.0",
     "com.unity.modules.audio": "1.0.0",
@@ -18,6 +18,6 @@
     "preferences"
   ],
   "author": {
-    "name": "Morgan Houston"
+    "name": "MMs Gaming Co"
   }
 }

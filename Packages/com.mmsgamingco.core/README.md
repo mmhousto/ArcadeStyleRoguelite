@@ -1,4 +1,4 @@
-# Morgan Houston Core (`com.morganhouston.core`)
+# MMs Gaming Co Core (`com.mmsgamingco.core`)
 
 Reusable boilerplate pulled out of ZombCube and cleaned up for new projects.
 Namespace: `Com.MMsGamingCo.Core` (services: `Com.MMsGamingCo.Core.Services`).
@@ -8,7 +8,7 @@ Namespace: `Com.MMsGamingCo.Core` (services: `Com.MMsGamingCo.Core.Services`).
 Add this line to `Packages/manifest.json` under `dependencies`:
 
 ```json
-"com.morganhouston.core": "https://github.com/mmhousto/ArcadeStyleRoguelite.git?path=/Packages/com.morganhouston.core#Chad"
+"com.mmsgamingco.core": "https://github.com/mmhousto/ArcadeStyleRoguelite.git?path=/Packages/com.mmsgamingco.core#Chad"
 ```
 
 Pin a tag or commit instead of `#Chad` once the package is stable. If the package later

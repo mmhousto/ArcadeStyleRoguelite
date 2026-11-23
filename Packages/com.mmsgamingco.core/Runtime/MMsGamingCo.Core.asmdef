@@ -1,5 +1,5 @@
 {
-    "name": "MorganHouston.Core",
+    "name": "MMsGamingCo.Core",
     "rootNamespace": "Com.MMsGamingCo.Core",
     "references": [
         "Unity.TextMeshPro",

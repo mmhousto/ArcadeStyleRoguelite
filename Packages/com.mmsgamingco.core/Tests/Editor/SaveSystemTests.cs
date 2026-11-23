@@ -36,7 +36,7 @@ public class SaveSystemTests
     [SetUp]
     public void SetUp()
     {
-        folder = Path.Combine(Path.GetTempPath(), "MHCoreSaveTests_" + System.Guid.NewGuid().ToString("N"));
+        folder = Path.Combine(Path.GetTempPath(), "MMsCoreSaveTests_" + System.Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(folder);
         SaveSystem.saveFolder = folder;
     }

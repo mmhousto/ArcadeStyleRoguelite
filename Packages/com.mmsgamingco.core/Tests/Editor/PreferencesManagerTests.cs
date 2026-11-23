@@ -8,7 +8,7 @@ public class PreferencesManagerTests
 {
     private static readonly string[] Keys =
     {
-        PrefKeys.MasterVolume, PrefKeys.MusicVolume, PrefKeys.Haptics, "MHCoreTestBool"
+        PrefKeys.MasterVolume, PrefKeys.MusicVolume, PrefKeys.Haptics, "MMsCoreTestBool"
     };
 
     private readonly System.Collections.Generic.Dictionary<string, string> saved =
@@ -73,10 +73,10 @@ public class PreferencesManagerTests
         System.Action<string> handler = key => changedKey = key;
 
         PreferencesManager.preferenceChanged += handler;
-        PreferencesManager.SetBool("MHCoreTestBool", true);
+        PreferencesManager.SetBool("MMsCoreTestBool", true);
         PreferencesManager.preferenceChanged -= handler;
 
-        Assert.AreEqual("MHCoreTestBool", changedKey);
-        Assert.IsTrue(PreferencesManager.GetBool("MHCoreTestBool"));
+        Assert.AreEqual("MMsCoreTestBool", changedKey);
+        Assert.IsTrue(PreferencesManager.GetBool("MMsCoreTestBool"));
     }
 }
