@@ -10,7 +10,7 @@ namespace Com.MMsGamingCo.Ricomet
     /// Gamepad: point the left stick where you want to go, press A or RT to dash.
     /// Call Tick() once per frame before reading the values.
     /// </summary>
-    public class AimInput
+    public class AimInput : IAimSource
     {
         private const float StickDeadZone = 0.25f;
 

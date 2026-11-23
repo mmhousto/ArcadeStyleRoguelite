@@ -2,6 +2,26 @@
 
 Versions are 0.x during development; 1.0 is launch. Each version has its own `v<version>` branch.
 
+## 0.4: Playtest bot and tutorial
+
+- **Playtest bot** (`BotPilot`, `BotDirector`): simulates 216 possible dashes (72 directions
+  x 3 powers, with wall bounces and shield ricochets) and picks the best by kills and boss hits
+  minus landing danger (enemies, Dart charge lines, beams, orbs, boss core, inside the shield).
+  Keeps a charge in reserve and escapes when stopping gets dangerous. Always picks a Rare or
+  better upgrade when offered (rarest first).
+- Watch it: Ricomet > Playtest > Watch Bot Play (loops runs), or press P during play.
+- **Automated playtest** (Play Mode test `BotPlaytest`): the bot plays Sector 1 on seeds 101,
+  202 and 303 at 3x speed, using a temporary save folder. Each run writes a Markdown report and
+  a line in `Logs/Playtests/summary.csv`.
+- **Tutorial overlay**: 15 hints from the first drag to the Prism boss (aim, dash, kill,
+  energy, slow motion, wall bounce, stopping, combo, Darts, Splitters, upgrade picker, boss
+  core, shield ricochet, beams, phases). Each completes when the player does it (or after a few
+  seconds for explanations) and is saved so it never shows again. New-enemy, picker and boss
+  hints interrupt the basics. Off while the bot plays.
+- Reset the tutorial with T during play or Ricomet > Saves > Reset Tutorial.
+- Comet input goes through `IAimSource`, so the player and the bot drive it the same way.
+- `Logs/` is now git-ignored.
+
 ## 0.3: Sector 1 boss
 
 - **Prism**, the Sector 1 boss, after wave 4 (with an upgrade pick first and a WARNING banner):

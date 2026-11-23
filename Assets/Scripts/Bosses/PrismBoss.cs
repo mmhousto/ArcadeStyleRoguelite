@@ -54,6 +54,15 @@ namespace Com.MMsGamingCo.Ricomet
         public bool IsInvulnerable { get { return introTimer > 0f || phaseChangeTimer > 0f; } }
         public string DisplayName { get { return "PRISM"; } }
 
+        /// <summary>True while beams are warning or firing.</summary>
+        public bool BeamsDangerous { get { return beamState != BeamState.Resting && phaseChangeTimer <= 0f && introTimer <= 0f; } }
+        public bool BeamsActive { get { return beamState == BeamState.Active && phaseChangeTimer <= 0f; } }
+        public int BeamCount { get { return CurrentPhaseSettings.beamCount; } }
+        public float BeamSweepSpeed { get { return CurrentPhaseSettings.beamSweepSpeed; } }
+
+        /// <summary>Raised when beams start firing (after their warning).</summary>
+        public static event Action beamsFired;
+
         private readonly PrismPhase[] phases =
         {
             new PrismPhase("XXX-XXX-", 35f, 2, 22f, 0f, 0, 7f, EnemyIds.Drifter, EnemyIds.Drifter, EnemyIds.Drifter),
@@ -271,6 +280,7 @@ namespace Com.MMsGamingCo.Ricomet
                         beamState = BeamState.Active;
                         beamTimer = beamActiveTime;
                         ScreenShake.Add(0.15f);
+                        beamsFired?.Invoke();
                     }
                     break;
 
@@ -332,9 +342,10 @@ namespace Com.MMsGamingCo.Ricomet
                 WaveDirector.Instance.SpawnWithWarning(minion);
         }
 
-        private Vector2 BeamDirection(int index, int count)
+        /// <summary>Direction of a beam, optionally predicted extraSeconds ahead.</summary>
+        public Vector2 BeamDirection(int index, int count, float extraSeconds = 0f)
         {
-            float angle = (beamAngle + index * 360f / count) * Mathf.Deg2Rad;
+            float angle = (beamAngle + BeamSweepSpeed * extraSeconds + index * 360f / count) * Mathf.Deg2Rad;
             return new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
         }
 

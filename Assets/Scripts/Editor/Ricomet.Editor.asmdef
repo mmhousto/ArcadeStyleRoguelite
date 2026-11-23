@@ -1,0 +1,19 @@
+{
+    "name": "Ricomet.Editor",
+    "rootNamespace": "Com.MMsGamingCo.Ricomet.Editor",
+    "references": [
+        "Ricomet",
+        "MMsGamingCo.Core"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -122,8 +122,9 @@ namespace Com.MMsGamingCo.Ricomet
 
             GUI.color = new Color(1f, 1f, 1f, 0.3f);
             PrototypeTuning tuning = PrototypeTuning.Instance;
-            GUI.Label(new Rect(left, safe.yMax - 50f, 900f, 40f),
-                "[B] Base wall bounce: " + (tuning.bounceOffWalls ? "on" : "off") + "    [F] Limit focus: " + (tuning.limitFocus ? "on" : "off"), smallStyle);
+            GUI.Label(new Rect(left, safe.yMax - 50f, 1300f, 40f),
+                "[B] Wall bounce: " + (tuning.bounceOffWalls ? "on" : "off") + "   [F] Limit focus: " + (tuning.limitFocus ? "on" : "off") +
+                "   [P] Bot: " + (BotDirector.Instance != null && BotDirector.Instance.IsActive ? "on" : "off") + "   [T] Reset tutorial", smallStyle);
 
             if (run.IsOver)
                 DrawEndScreen(run, width);
@@ -342,6 +343,8 @@ namespace Com.MMsGamingCo.Ricomet
             bool changed = false;
             if (keyboard.bKey.wasPressedThisFrame) { tuning.bounceOffWalls = !tuning.bounceOffWalls; changed = true; }
             if (keyboard.fKey.wasPressedThisFrame) tuning.limitFocus = !tuning.limitFocus;
+            if (keyboard.pKey.wasPressedThisFrame && BotDirector.Instance != null) BotDirector.Instance.Toggle();
+            if (keyboard.tKey.wasPressedThisFrame && TutorialManager.Instance != null) TutorialManager.Instance.ResetTutorial();
 
             if (changed && RunManager.Instance != null)
                 RunManager.Instance.RebuildStats();

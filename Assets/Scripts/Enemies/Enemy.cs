@@ -24,6 +24,9 @@ namespace Com.MMsGamingCo.Ricomet
         /// <summary>Raised when any enemy dies.</summary>
         public static event Action<Enemy> enemyKilled;
 
+        /// <summary>Raised when any enemy takes damage (including the killing blow).</summary>
+        public static event Action<Enemy, DamageSource> enemyDamaged;
+
         [Tooltip("Stable ID used by waves and saves. Never rename after release.")]
         public string enemyId = "enemy";
         public float maxHealth = 1f;
@@ -120,6 +123,7 @@ namespace Com.MMsGamingCo.Ricomet
             LastDamageSource = source;
             Health -= damageTaken;
             flashTimer = 0.06f;
+            enemyDamaged?.Invoke(this, source);
 
             if (Health <= 0f)
                 Die();

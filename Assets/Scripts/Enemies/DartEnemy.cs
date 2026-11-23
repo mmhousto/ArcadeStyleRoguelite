@@ -18,6 +18,15 @@ namespace Com.MMsGamingCo.Ricomet
 
         public override bool DealsContactDamage { get { return state != DartState.Recover; } }
 
+        /// <summary>True while winding up or charging: the line ahead of it is dangerous.</summary>
+        public bool IsThreatening { get { return IsAlive && !IsStunned && (state == DartState.Windup || state == DartState.Charge); } }
+
+        /// <summary>Direction of the current or upcoming charge.</summary>
+        public Vector2 ChargeDirection { get { return chargeDirection; } }
+
+        /// <summary>How far a charge travels.</summary>
+        public float ChargeLength { get { return tuning.dartChargeSpeed * tuning.dartChargeTime; } }
+
         protected override void BuildVisuals()
         {
             enemyId = "enemy_dart";

@@ -1,7 +1,7 @@
-# Ricomet Prototype (v0.3)
+# Ricomet Prototype (v0.4)
 
 Gray-box prototype. v0.1 asked **is dashing fun?** v0.2 added the roguelite run loop
-(waves and upgrades). v0.3 adds the Sector 1 boss, the Prism.
+(waves and upgrades), v0.3 the Sector 1 boss, and v0.4 a tutorial and a playtest bot.
 Everything is built from code at runtime: no prefabs, no art, no UI assets.
 
 ## Run it
@@ -23,7 +23,8 @@ To try it on an iPhone, build for iOS as normal; the prototype scene is the firs
 | Reroll | Tap Reroll | X or Y | R |
 | End screen | Tap a button | A = main button, X/Y = New Run | Enter / R |
 
-Debug keys: **B** toggles the standard wall bounce (on by default), **F** toggles the Focus limit.
+Debug keys: **B** toggles the standard wall bounce (on by default), **F** toggles the Focus limit,
+**P** turns the playtest bot on/off, **T** resets the tutorial.
 
 When a dash ends, a landing pulse (the ring) knocks back and briefly stuns enemies around you.
 Taking a hit pushes enemies further away. Tune both under **Knockback** in `PrototypeTuning`.
@@ -76,6 +77,29 @@ Taking a hit pushes enemies further away. Tune both under **Knockback** in `Prot
 Arc and Shatter only trigger from dash and Shockwave kills, so chains can't loop forever.
 Upgrade offers and spawns use separate seeded random streams: the same seed always gives the
 same spawns, whatever upgrades you take.
+
+## Tutorial
+
+Hints appear in a panel near the bottom of the screen while you play, from the first drag up
+to the Prism. Each one disappears when you do what it says ("Nice!") and is saved, so it never
+shows again. Hints about Darts, Splitters, the upgrade picker and the boss appear as soon as
+they're relevant. Reset with **T** or Ricomet > Saves > Reset Tutorial.
+
+## Playtest bot
+
+- **Watch it:** Ricomet > Playtest > Watch Bot Play. It plays run after run (restarting 3
+  seconds after each). Or press **P** any time during play to hand over / take back control.
+- **How it plays:** every 0.04s it simulates 216 dashes (72 directions x 3 powers, including
+  wall bounces and shield ricochets), scores kills and boss hits against how dangerous each
+  landing spot is, and keeps a charge in reserve for escapes.
+- **Upgrades:** always a Rare or better card if one is offered (rarest first), otherwise
+  Reserve > Siphon > Shockwave > Rebound > Overdrive > Clarity.
+- **Automated runs:** Ricomet > Playtest > Run Bot Playtests opens the Test Runner. Under
+  **PlayMode**, run `BotPlaytest`. It plays Sector 1 on seeds 101, 202 and 303 at 3x speed
+  (a couple of minutes each) without touching your saves. A test fails if the bot dies.
+- **Reports:** `Logs/Playtests/` (Ricomet > Playtest > Open Playtest Reports) gets a Markdown
+  report per run (outcome, time to boss, boss phase reached, hits taken and where, upgrades) and
+  a line in `summary.csv` for comparing balance changes over time.
 
 ## Tuning
 

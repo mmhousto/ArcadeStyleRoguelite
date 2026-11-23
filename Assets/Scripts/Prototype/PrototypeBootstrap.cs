@@ -19,11 +19,27 @@ namespace Com.MMsGamingCo.Ricomet
         [Tooltip("Extra world units shown around the arena.")]
         public float cameraMargin = 1f;
 
+        [Tooltip("Let the playtest bot play. Press P during play to toggle.")]
+        public bool botPlays = false;
+
+        /// <summary>Set by automated playtests before loading the scene. Null = use the inspector values.</summary>
+        public static int? seedOverride = null;
+        public static bool? botOverride = null;
+
+        /// <summary>Editor menu flag (Ricomet > Playtest > Watch Bot).</summary>
+        public const string WatchBotKey = "Ricomet.WatchBot";
+
         private void Awake()
         {
             PrototypeTuning.Use(tuning);
             PrototypeTuning settings = PrototypeTuning.Instance;
-            int runSeed = seed != 0 ? seed : SeededRandom.NewSeed();
+            int chosenSeed = seedOverride ?? seed;
+            int runSeed = chosenSeed != 0 ? chosenSeed : SeededRandom.NewSeed();
+
+            bool bot = botOverride ?? botPlays;
+#if UNITY_EDITOR
+            if (UnityEditor.SessionState.GetBool(WatchBotKey, false)) bot = true;
+#endif
 
             Application.targetFrameRate = PreferencesManager.GetTargetFrameRate();
 
@@ -42,12 +58,21 @@ namespace Com.MMsGamingCo.Ricomet
             CreateChild<EnemyProjectiles>("Enemy Projectiles");
             CreateChild<PrototypeHUD>("HUD");
             CreateChild<UpgradePickerUI>("Upgrade Picker");
+            CreateChild<TutorialManager>("Tutorial");
+            BotDirector botDirector = CreateChild<BotDirector>("Playtest Bot");
 
             // Separate random streams, so taking different upgrades never changes the spawns.
             CreateChild<WaveDirector>("Wave Director").Setup(settings, SectorCatalog.Sector1(),
                 new SeededRandom(runSeed), new SeededRandom(runSeed + 1));
 
-            Debug.Log("Ricomet prototype started. Seed " + runSeed);
+            if (bot)
+            {
+                botDirector.SetBotActive(true);
+                // Watching from the editor menu: loop runs so you can leave it going.
+                botDirector.autoRestart = botOverride == null;
+            }
+
+            Debug.Log("Ricomet prototype started. Seed " + runSeed + (bot ? " (bot playing)" : ""));
         }
 
         private void SetupCamera(PrototypeTuning settings)

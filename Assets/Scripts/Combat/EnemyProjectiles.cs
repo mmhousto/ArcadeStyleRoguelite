@@ -15,6 +15,12 @@ namespace Com.MMsGamingCo.Ricomet
 
         private readonly List<EnemyProjectile> projectiles = new List<EnemyProjectile>();
 
+        /// <summary>Every projectile, active or not. Check IsActive.</summary>
+        public static IReadOnlyList<EnemyProjectile> All
+        {
+            get { return _instance != null ? _instance.projectiles : (IReadOnlyList<EnemyProjectile>)new EnemyProjectile[0]; }
+        }
+
         private void Awake()
         {
             _instance = this;

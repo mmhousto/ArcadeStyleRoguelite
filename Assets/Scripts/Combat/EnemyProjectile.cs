@@ -16,6 +16,9 @@ namespace Com.MMsGamingCo.Ricomet
         private float lifetime;
 
         public bool IsActive { get; private set; }
+        public Vector2 Position { get { return transform.position; } }
+        public Vector2 Velocity { get { return velocity; } }
+        public float HitRadius { get { return Radius; } }
 
         private void Awake()
         {

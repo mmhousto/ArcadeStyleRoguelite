@@ -26,7 +26,10 @@ namespace Com.MMsGamingCo.Ricomet
         public DashEnergy Energy { get; private set; }
         public FocusMeter Focus { get; private set; }
         public CometHealth Health { get; private set; }
-        public AimInput Input { get; private set; }
+        public IAimSource Input { get; private set; }
+
+        /// <summary>True while the playtest bot is flying the comet.</summary>
+        public bool IsBotControlled { get { return !(Input is AimInput); } }
         public CometStats Stats { get; private set; }
 
         public bool IsDashing { get { return State == CometState.Dashing; } }
@@ -56,6 +59,12 @@ namespace Com.MMsGamingCo.Ricomet
 
         /// <summary>Raised with the landing position and number of kills when a dash ends.</summary>
         public static event Action<Vector2, int> dashEnded;
+
+        /// <summary>Raised when a dash bounces off an arena wall.</summary>
+        public static event Action wallBounced;
+
+        /// <summary>Raised when a dash ricochets off an obstacle such as a boss shield.</summary>
+        public static event Action obstacleDeflected;
 
         private PrototypeTuning tuning;
         private bool inputLocked = false;
@@ -177,6 +186,17 @@ namespace Com.MMsGamingCo.Ricomet
             BuildVisuals();
         }
 
+        /// <summary>
+        /// Swaps who controls the comet. Pass null to give control back to the player.
+        /// </summary>
+        public void SetInputSource(IAimSource source)
+        {
+            Input.Cancel();
+            Input = source ?? new AimInput(tuning);
+            SetAimScale(1f);
+            if (State == CometState.Aiming) State = CometState.Idle;
+        }
+
         /// <summary>Applies new stats after an upgrade. Extra charges and shields are filled.</summary>
         public void ApplyStats(CometStats newStats)
         {
@@ -252,6 +272,7 @@ namespace Com.MMsGamingCo.Ricomet
                 dashDirection = Vector2.Reflect(dashDirection, wallNormal);
                 EffectSpawner.Landing(end, 0.9f);
                 ScreenShake.Add(0.12f);
+                obstacleDeflected?.Invoke();
             }
             else if (hitSomething)
             {
@@ -260,6 +281,7 @@ namespace Com.MMsGamingCo.Ricomet
                     bouncesLeft--;
                     dashDirection = Vector2.Reflect(dashDirection, wallNormal);
                     ScreenShake.Add(0.1f);
+                    wallBounced?.Invoke();
                 }
                 else
                 {

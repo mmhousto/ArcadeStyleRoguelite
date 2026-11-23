@@ -14,6 +14,9 @@ namespace Com.MMsGamingCo.Ricomet
         public static TimeController Instance { get { return _instance; } }
 
         private const float BaseFixedDeltaTime = 0.02f;
+
+        /// <summary>Multiplies game speed. Automated playtests run faster than real time.</summary>
+        public static float speedMultiplier = 1f;
         private const float HitStopScale = 0.02f;
 
         private float aimScale = 1f;
@@ -75,6 +78,7 @@ namespace Com.MMsGamingCo.Ricomet
             float scale = aimScale;
             if (hitStopTimer > 0f) scale = Mathf.Min(scale, HitStopScale);
             if (paused) scale = 0f;
+            scale *= Mathf.Max(0.1f, speedMultiplier);
 
             Time.timeScale = scale;
             // Keep physics steps smooth in slow motion.
