@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Com.MorganHouston.Core
+namespace Com.MMsGamingCo.Core
 {
 
     /// <summary>

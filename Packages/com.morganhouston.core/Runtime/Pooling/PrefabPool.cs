@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Pool;
 
-namespace Com.MorganHouston.Core
+namespace Com.MMsGamingCo.Core
 {
 
     /// <summary>

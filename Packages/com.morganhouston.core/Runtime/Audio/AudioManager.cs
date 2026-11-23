@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Audio;
 
-namespace Com.MorganHouston.Core
+namespace Com.MMsGamingCo.Core
 {
 
     /// <summary>

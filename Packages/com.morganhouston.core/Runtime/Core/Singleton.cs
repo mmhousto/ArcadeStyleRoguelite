@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Com.MorganHouston.Core
+namespace Com.MMsGamingCo.Core
 {
 
     /// <summary>

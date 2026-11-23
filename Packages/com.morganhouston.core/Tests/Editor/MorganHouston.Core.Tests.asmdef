@@ -1,6 +1,6 @@
 {
     "name": "MorganHouston.Core.Tests",
-    "rootNamespace": "Com.MorganHouston.Core.Tests",
+    "rootNamespace": "Com.MMsGamingCo.Core.Tests",
     "references": [
         "MorganHouston.Core",
         "UnityEngine.TestRunner",

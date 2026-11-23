@@ -1,7 +1,7 @@
 # Morgan Houston Core (`com.morganhouston.core`)
 
 Reusable boilerplate pulled out of ZombCube and cleaned up for new projects.
-Namespace: `Com.MorganHouston.Core` (services: `Com.MorganHouston.Core.Services`).
+Namespace: `Com.MMsGamingCo.Core` (services: `Com.MMsGamingCo.Core.Services`).
 
 ## Install in another project
 

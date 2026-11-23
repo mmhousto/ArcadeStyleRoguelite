@@ -1,4 +1,4 @@
-namespace Com.MorganHouston.Core
+namespace Com.MMsGamingCo.Core
 {
 
     /// <summary>Anything that can take damage, e.g. IDamageable&lt;float&gt;.</summary>

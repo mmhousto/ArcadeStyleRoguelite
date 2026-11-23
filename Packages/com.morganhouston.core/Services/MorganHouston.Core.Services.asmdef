@@ -1,6 +1,6 @@
 {
     "name": "MorganHouston.Core.Services",
-    "rootNamespace": "Com.MorganHouston.Core.Services",
+    "rootNamespace": "Com.MMsGamingCo.Core.Services",
     "references": [
         "MorganHouston.Core",
         "Unity.Services.Core",

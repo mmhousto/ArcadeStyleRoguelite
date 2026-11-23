@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using UnityEngine;
-using Com.MorganHouston.Core;
+using Com.MMsGamingCo.Core;
 
 // Checks settings defaults and that values are clamped and stored.
 // Runs against real PlayerPrefs, so every key touched here is restored afterwards.

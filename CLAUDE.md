@@ -14,7 +14,7 @@ Unity 6 (6000.3) URP project, iOS first. Arcade-style roguelite.
 Matches Morgan's existing projects (ZombCube). Follow it for all new code.
 
 ### Namespaces and files
-- `Com.MorganHouston.<Project>` for game code, `Com.MorganHouston.Core` for the package.
+- `Com.MMsGamingCo.<Project>` for game code, `Com.MMsGamingCo.Core` for the package.
 - One public type per file, file named after the type.
 - Blank line after the `namespace {` line and before its closing brace.
 - Allman braces, 4-space indent. Short `if` bodies may skip braces on the next line;

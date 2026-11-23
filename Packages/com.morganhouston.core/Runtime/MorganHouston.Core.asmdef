@@ -1,6 +1,6 @@
 {
     "name": "MorganHouston.Core",
-    "rootNamespace": "Com.MorganHouston.Core",
+    "rootNamespace": "Com.MMsGamingCo.Core",
     "references": [
         "Unity.TextMeshPro",
         "UnityEngine.UI"

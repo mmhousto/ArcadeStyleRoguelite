@@ -1,6 +1,6 @@
 using System.IO;
 using NUnit.Framework;
-using Com.MorganHouston.Core;
+using Com.MMsGamingCo.Core;
 
 // Checks local saves round-trip, survive a corrupt file, and upgrade old formats.
 public class SaveSystemTests

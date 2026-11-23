@@ -7,7 +7,7 @@ using Unity.Services.CloudSave.Models;
 using Unity.Services.Core;
 using UnityEngine;
 
-namespace Com.MorganHouston.Core.Services
+namespace Com.MMsGamingCo.Core.Services
 {
 
     /// <summary>

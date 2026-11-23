@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using Com.MorganHouston.Core;
+using Com.MMsGamingCo.Core;
 
 // Checks slider values convert to mixer decibels and back.
 public class AudioMathTests
