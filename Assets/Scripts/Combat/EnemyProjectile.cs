@@ -53,7 +53,7 @@ namespace Com.MMsGamingCo.Ricomet
                     return;
                 }
 
-                if (comet.TryDamage())
+                if (comet.TryDamage("orb"))
                 {
                     Despawn();
                     return;

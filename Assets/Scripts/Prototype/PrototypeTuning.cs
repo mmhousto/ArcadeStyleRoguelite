@@ -61,6 +61,8 @@ namespace Com.MMsGamingCo.Ricomet
         [Header("Energy")]
         public float maxCharges = 3f;
         public float killRefund = 0.35f;
+        [Tooltip("Energy refunded when a dash hits a boss.")]
+        public float bossHitRefund = 0.75f;
         [Tooltip("Seconds to regain one charge while stopped.")]
         public float secondsPerCharge = 2.5f;
 

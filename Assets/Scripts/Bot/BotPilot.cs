@@ -21,7 +21,8 @@ namespace Com.MMsGamingCo.Ricomet
         private const float KillScore = 10f;
         private const float BossHitScore = 40f;
         private const float DangerWeight = 12f;
-        private const float EscapeDanger = 1.2f;
+        private const float EscapeDanger = 1f;
+        private const float LookAhead = 1.2f;
 
         public bool IsAiming { get { return false; } }
         public bool InDeadZone { get { return false; } }
@@ -108,7 +109,10 @@ namespace Com.MMsGamingCo.Ricomet
                 }
             }
 
-            bool worthIt = bestAttack.bossHit || bestAttack.kills >= 2f || (bestAttack.kills >= 1f && hasReserve);
+            // Boss hits refund energy, but landing somewhere dangerous with no reserve still kills you.
+            bool safeLanding = bestAttack.landingDanger < 0.4f;
+            bool bossWorthIt = bestAttack.bossHit && (hasReserve || safeLanding);
+            bool worthIt = bossWorthIt || bestAttack.kills >= 2f || (bestAttack.kills >= 1f && (hasReserve || safeLanding));
             if (bestAttack.score >= KillScore * 0.5f && worthIt)
             {
                 Fire(bestAttack, bestAttack.bossHit ? "boss" : "attack");
@@ -174,7 +178,10 @@ namespace Com.MMsGamingCo.Ricomet
             // Slight preference for open space over corners.
             float centerBonus = 1f - Mathf.Clamp01(landing.magnitude / (Arena.Bounds.width * 0.5f));
 
-            plan.score = plan.kills * KillScore + (plan.bossHit ? BossHitScore : 0f)
+            // Low on energy: kills (which refund) matter more than the boss.
+            float bossScore = comet.Energy.Current < 2f ? BossHitScore * 0.5f : BossHitScore;
+
+            plan.score = plan.kills * KillScore + (plan.bossHit ? bossScore : 0f)
                 - plan.landingDanger * DangerWeight + centerBonus;
             return plan;
         }
@@ -255,19 +262,14 @@ namespace Com.MMsGamingCo.Ricomet
                     danger += (1f - distance / reach) * (enemy.IsStunned ? 0.6f : 2f);
             }
 
+            // Orbs: check their whole path over the next moment, not a few sample points.
             foreach (EnemyProjectile projectile in EnemyProjectiles.All)
             {
                 if (!projectile.IsActive) continue;
 
-                for (float t = 0f; t <= 0.9f; t += 0.3f)
-                {
-                    Vector2 future = projectile.Position + projectile.Velocity * t;
-                    if (Geometry2D.CirclesOverlap(future, projectile.HitRadius + 0.4f, point, radius))
-                    {
-                        danger += 3f;
-                        break;
-                    }
-                }
+                Vector2 future = projectile.Position + projectile.Velocity * LookAhead;
+                if (Geometry2D.SweptCircleHit(projectile.Position, future, projectile.HitRadius + 0.45f, point, radius))
+                    danger += 3f;
             }
 
             return danger;
@@ -288,14 +290,14 @@ namespace Com.MMsGamingCo.Ricomet
                 int count = boss.BeamCount;
                 for (int i = 0; i < count; i++)
                 {
-                    for (float t = 0f; t <= 0.9f; t += 0.3f)
+                    for (float t = 0f; t <= LookAhead; t += 0.15f)
                     {
                         Vector2 direction = boss.BeamDirection(i, count, t);
                         Vector2 end = boss.Position + direction * boss.beamLength;
-                        if (Geometry2D.SweptCircleHit(boss.Position, end, boss.beamHalfWidth + 0.4f, point, radius))
+                        if (Geometry2D.SweptCircleHit(boss.Position, end, boss.beamHalfWidth + 0.45f, point, radius))
                         {
                             danger += boss.BeamsActive ? 6f : 4f;
-                            t = 1f;
+                            break;
                         }
                     }
                 }

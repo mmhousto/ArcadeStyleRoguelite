@@ -66,8 +66,8 @@ namespace Com.MMsGamingCo.Ricomet
         private readonly PrismPhase[] phases =
         {
             new PrismPhase("XXX-XXX-", 35f, 2, 22f, 0f, 0, 7f, EnemyIds.Drifter, EnemyIds.Drifter, EnemyIds.Drifter),
-            new PrismPhase("XX-XX-X-", -55f, 3, 30f, 4.5f, 8, 9f, EnemyIds.Drifter, EnemyIds.Drifter, EnemyIds.Dart),
-            new PrismPhase("X-X-X-X-", 80f, 4, 38f, 3.5f, 12, 10f, EnemyIds.Splitter, EnemyIds.Drifter, EnemyIds.Drifter),
+            new PrismPhase("XX-XX-X-", -55f, 3, 30f, 5f, 8, 9f, EnemyIds.Drifter, EnemyIds.Drifter, EnemyIds.Dart),
+            new PrismPhase("X-X-X-X-", 75f, 3, 34f, 4.5f, 10, 10f, EnemyIds.Splitter, EnemyIds.Drifter, EnemyIds.Drifter),
         };
 
         private RotatingShield shield;
@@ -350,7 +350,7 @@ namespace Com.MMsGamingCo.Ricomet
                 Vector2 direction = BeamDirection(i, count);
                 if (Geometry2D.SweptCircleHit(Position, Position + direction * beamLength, beamHalfWidth, comet.Position, comet.Radius))
                 {
-                    comet.TryDamage();
+                    comet.TryDamage("beam");
                     return;
                 }
             }
@@ -360,6 +360,9 @@ namespace Com.MMsGamingCo.Ricomet
         {
             PrismPhase settings = CurrentPhaseSettings;
             if (settings.volleyInterval <= 0f) return;
+
+            // Orbs wait while beams are up, so the two attacks alternate instead of stacking.
+            if (beamState != BeamState.Resting) return;
 
             volleyTimer -= deltaTime;
             if (volleyTimer > 0f) return;

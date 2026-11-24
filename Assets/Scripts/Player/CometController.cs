@@ -28,6 +28,9 @@ namespace Com.MMsGamingCo.Ricomet
         public CometHealth Health { get; private set; }
         public IAimSource Input { get; private set; }
 
+        /// <summary>What caused the last hit ("beam", "orb", "touched enemy_dart"...), for playtest reports.</summary>
+        public string LastHitCause { get; private set; } = "";
+
         /// <summary>True while the playtest bot is flying the comet.</summary>
         public bool IsBotControlled { get { return !(Input is AimInput); } }
         public CometStats Stats { get; private set; }
@@ -111,12 +114,14 @@ namespace Com.MMsGamingCo.Ricomet
         private void OnEnable()
         {
             Enemy.enemyKilled += OnEnemyKilled;
+            Enemy.enemyDamaged += OnEnemyDamaged;
             CometHealth.cometDamaged += OnDamaged;
         }
 
         private void OnDisable()
         {
             Enemy.enemyKilled -= OnEnemyKilled;
+            Enemy.enemyDamaged -= OnEnemyDamaged;
             CometHealth.cometDamaged -= OnDamaged;
         }
 
@@ -374,10 +379,23 @@ namespace Com.MMsGamingCo.Ricomet
                 if (enemy.CanHurtComet &&
                     Geometry2D.CirclesOverlap(Position, tuning.cometRadius, enemy.Position, enemy.Radius))
                 {
+                    LastHitCause = "touched " + enemy.enemyId;
                     Health.TakeHit();
                     return;
                 }
             }
+        }
+
+        /// <summary>
+        /// Boss hits refund energy like kills do. Without this, attacking a boss drains
+        /// your charges and leaves you stranded right when its attacks peak.
+        /// </summary>
+        private void OnEnemyDamaged(Enemy enemy, DamageSource source)
+        {
+            if (!(enemy is PrismBoss) || source != DamageSource.Dash || !enemy.IsAlive) return;
+
+            Energy.Refund(tuning.bossHitRefund);
+            Focus.Add(tuning.focusPerKill * 2f);
         }
 
         private void OnEnemyKilled(Enemy enemy)
@@ -396,9 +414,10 @@ namespace Com.MMsGamingCo.Ricomet
         /// Damage from hazards (beams, projectiles). Ignored while dashing, during the
         /// post-dash grace period and while invulnerable. Returns true if the hit landed.
         /// </summary>
-        public bool TryDamage()
+        public bool TryDamage(string cause)
         {
-            if (IsDashing || graceTimer > 0f || Health.IsDead) return false;
+            if (IsDashing || graceTimer > 0f || Health.IsDead || Health.IsInvulnerable) return false;
+            LastHitCause = cause;
             return Health.TakeHit();
         }
 

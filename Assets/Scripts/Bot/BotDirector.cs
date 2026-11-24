@@ -152,7 +152,10 @@ namespace Com.MMsGamingCo.Ricomet
             HitsTaken++;
             string where = PrismBoss.Current != null ? "boss phase " + (PrismBoss.Current.Phase + 1) :
                 WaveDirector.Instance != null ? "wave " + WaveDirector.Instance.WaveNumber : "?";
-            HitLog.Add(where + (Pilot != null ? ", last decision " + Pilot.LastDecision : ""));
+            CometController comet = CometController.Instance;
+            string cause = comet != null ? comet.LastHitCause : "?";
+            string energy = comet != null ? comet.Energy.Current.ToString("0.0") : "?";
+            HitLog.Add(where + ": " + cause + " (energy " + energy + ", decision " + (Pilot != null ? Pilot.LastDecision : "player") + ")");
         }
 
         private void OnDeflected()

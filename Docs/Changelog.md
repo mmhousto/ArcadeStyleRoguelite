@@ -13,6 +13,17 @@ Versions are 0.x during development; 1.0 is launch. Each version has its own `v<
 - Safety net: a stopped comet overlapping the core is pushed out.
 - The aim line and the bot both show and use the core ricochet. Boss tutorial hints explain it.
 
+**Second playtest round** (bot reached phases 2-3 on all seeds, but every hit came while it
+was stopped and out of energy):
+- Dash hits on a boss refund 0.75 of a charge (and some Focus). Before, only kills refunded,
+  so attacking the Prism drained your charges and stranded you as its attacks peaked.
+- Prism phase 3 is more readable: 3 beams (was 4), orb rings of 10 every 4.5s (was 12 every
+  3.5s), slightly slower shield. Phase 2 orbs every 5s (was 4.5s). Orb rings never fire while
+  beams are up, so the attacks alternate.
+- Bot: keeps a reserve charge for boss hits unless the landing is safe, values kills over the
+  boss when low on energy, looks 1.2s ahead for beams, and checks each orb's whole path.
+- Playtest reports log what caused each hit (beam, orb, which enemy) and the energy left.
+
 
 - **Playtest bot** (`BotPilot`, `BotDirector`): simulates 216 possible dashes (72 directions
   x 3 powers, with wall bounces and shield ricochets) and picks the best by kills and boss hits

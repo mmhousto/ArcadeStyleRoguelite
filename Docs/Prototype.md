@@ -50,6 +50,8 @@ Taking a hit pushes enemies further away. Tune both under **Knockback** in `Prot
   changes direction, more beams, orb rings, and Darts and Splitters as minions. It flashes
   and can't be hurt for a moment between phases.
 - Damage to bosses: dash 2, Shockwave 1, other effects 0.5. Health 24, so about 12 dashes.
+  Each dash hit refunds 0.75 of a charge, so keep attacking to keep moving.
+- Orb rings never fire while beams are up: beams, then orbs, then beams.
   Tune it on the Prism object in the Inspector during Play (Health, shield radius, beam timings).
 
 ## Enemies
