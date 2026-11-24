@@ -31,6 +31,7 @@ namespace Com.MMsGamingCo.Ricomet
         public bool ReachedBoss { get; private set; }
         public float TimeToBoss { get; private set; }
         public int BossPhaseReached { get; private set; }
+        public int ShieldsAtBoss { get; private set; }
         public int HitsTaken { get; private set; }
         public int ShieldDeflects { get; private set; }
         public List<string> Picks { get; private set; } = new List<string>();
@@ -140,6 +141,7 @@ namespace Com.MMsGamingCo.Ricomet
             ReachedBoss = true;
             TimeToBoss = RunManager.Instance != null ? RunManager.Instance.RunTime : 0f;
             BossPhaseReached = 1;
+            ShieldsAtBoss = CometController.Instance != null ? CometController.Instance.Health.Shields : 0;
         }
 
         private void OnPhaseChanged(int phase)

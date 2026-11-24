@@ -182,6 +182,7 @@ namespace Com.MMsGamingCo.Ricomet
             tuning = newTuning;
             Stats = CometStats.FromTuning(tuning);
             Energy = new DashEnergy(Stats.maxCharges, 1f / Mathf.Max(0.1f, Stats.secondsPerCharge));
+            Energy.EmptyRegenMultiplier = tuning.emptyRegenMultiplier;
             Focus = new FocusMeter(Stats.focusSeconds, tuning.focusRefillPerSecond);
             Input = new AimInput(tuning);
 

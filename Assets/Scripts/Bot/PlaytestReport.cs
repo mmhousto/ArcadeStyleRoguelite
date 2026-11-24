@@ -16,6 +16,7 @@ namespace Com.MMsGamingCo.Ricomet
         public bool reachedBoss;
         public int bossPhaseReached;
         public float timeToBoss;
+        public int shieldsAtBoss;
         public float runTime;
         public int wave;
         public int score;
@@ -49,6 +50,7 @@ namespace Com.MMsGamingCo.Ricomet
                 report.reachedBoss = bot.ReachedBoss;
                 report.bossPhaseReached = bot.BossPhaseReached;
                 report.timeToBoss = bot.TimeToBoss;
+                report.shieldsAtBoss = bot.ShieldsAtBoss;
                 report.hitsTaken = bot.HitsTaken;
                 report.shieldDeflects = bot.ShieldDeflects;
                 report.picks = bot.Picks.ToArray();
@@ -78,7 +80,7 @@ namespace Com.MMsGamingCo.Ricomet
             text.AppendLine("| | |");
             text.AppendLine("|---|---|");
             text.AppendLine("| Run time | " + FormatTime(runTime) + " |");
-            text.AppendLine("| Reached boss | " + (reachedBoss ? "yes, at " + FormatTime(timeToBoss) : "no") + " |");
+            text.AppendLine("| Reached boss | " + (reachedBoss ? "yes, at " + FormatTime(timeToBoss) + " with " + shieldsAtBoss + " shields" : "no") + " |");
             text.AppendLine("| Score | " + score.ToString("N0") + " |");
             text.AppendLine("| Kills | " + kills + " |");
             text.AppendLine("| Best combo | " + bestCombo + " |");

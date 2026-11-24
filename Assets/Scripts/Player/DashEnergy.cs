@@ -13,6 +13,9 @@ namespace Com.MMsGamingCo.Ricomet
         public float Current { get; private set; }
         public float RegenPerSecond { get; set; }
 
+        /// <summary>Regen speed-up while below one charge, so being stranded never lasts long.</summary>
+        public float EmptyRegenMultiplier { get; set; } = 1f;
+
         public bool CanDash { get { return Current >= 1f; } }
 
         /// <summary>Whole charges ready to use.</summary>
@@ -40,7 +43,8 @@ namespace Com.MMsGamingCo.Ricomet
 
         public void Regen(float deltaTime)
         {
-            Refund(RegenPerSecond * deltaTime);
+            float rate = Current < 1f ? RegenPerSecond * EmptyRegenMultiplier : RegenPerSecond;
+            Refund(rate * deltaTime);
         }
 
         /// <summary>Changes the maximum. Raising it also adds the new charges.</summary>

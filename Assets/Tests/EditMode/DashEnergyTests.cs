@@ -56,6 +56,21 @@ public class DashEnergyTests
     }
 
     [Test]
+    public void StrandedRechargeIsFaster()
+    {
+        var energy = new DashEnergy(3f, 0.5f) { EmptyRegenMultiplier = 2f };
+        energy.Spend(); energy.Spend(); energy.Spend();
+
+        // Below one charge: double speed, so one charge is back in 1 second instead of 2.
+        energy.Regen(1f);
+        Assert.AreEqual(1f, energy.Current, 0.001f);
+
+        // Above one charge: normal speed again.
+        energy.Regen(1f);
+        Assert.AreEqual(1.5f, energy.Current, 0.001f);
+    }
+
+    [Test]
     public void FocusDrainsAndRefills()
     {
         var focus = new FocusMeter(2.5f, 1f);

@@ -62,6 +62,9 @@ namespace Com.MMsGamingCo.Ricomet
 
         public static event Action sectorCleared;
 
+        /// <summary>Raised when clearing a wave repaired a shield.</summary>
+        public static event Action shieldRepaired;
+
         /// <summary>Raised when the boss warning starts.</summary>
         public static event Action bossIncoming;
 
@@ -296,7 +299,22 @@ namespace Com.MMsGamingCo.Ricomet
 
             CurrentPhase = Phase.Cleared;
             phaseTimer = tuning.waveClearDelay;
+            RepairShields();
             waveCleared?.Invoke(WaveNumber, timeBonus);
+        }
+
+        /// <summary>Clearing a wave repairs shields, so early mistakes don't snowball into the boss.</summary>
+        private void RepairShields()
+        {
+            CometController comet = CometController.Instance;
+            if (comet == null || comet.Health.IsDead) return;
+
+            int before = comet.Health.Shields;
+            for (int i = 0; i < tuning.shieldsRepairedPerWave; i++)
+                comet.Health.RestoreShield();
+
+            if (comet.Health.Shields > before)
+                shieldRepaired?.Invoke();
         }
 
         private void AfterWaveCleared()

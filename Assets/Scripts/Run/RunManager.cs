@@ -62,6 +62,7 @@ namespace Com.MMsGamingCo.Ricomet
             CometController.dashEnded += OnDashEnded;
             CometHealth.cometDied += OnCometDied;
             WaveDirector.waveCleared += OnWaveCleared;
+            WaveDirector.shieldRepaired += OnShieldRepaired;
             PrismBoss.bossDefeated += OnBossDefeated;
         }
 
@@ -71,6 +72,7 @@ namespace Com.MMsGamingCo.Ricomet
             CometController.dashEnded -= OnDashEnded;
             CometHealth.cometDied -= OnCometDied;
             WaveDirector.waveCleared -= OnWaveCleared;
+            WaveDirector.shieldRepaired -= OnShieldRepaired;
             PrismBoss.bossDefeated -= OnBossDefeated;
         }
 
@@ -188,6 +190,11 @@ namespace Com.MMsGamingCo.Ricomet
         {
             if (timeBonus > 0)
                 trickPerformed?.Invoke("FAST CLEAR +" + timeBonus);
+        }
+
+        private void OnShieldRepaired()
+        {
+            trickPerformed?.Invoke("SHIELD REPAIRED");
         }
 
         private void OnBossDefeated()

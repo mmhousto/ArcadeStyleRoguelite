@@ -54,6 +54,11 @@ Taking a hit pushes enemies further away. Tune both under **Knockback** in `Prot
 - Orb rings never fire while beams are up: beams, then orbs, then beams.
   Tune it on the Prism object in the Inspector during Play (Health, shield radius, beam timings).
 
+## Survival
+
+- Clearing a wave repairs 1 shield.
+- Charges recharge every 2 seconds while stopped, twice as fast while you have less than one.
+
 ## Enemies
 
 - **Drifter** (triangle): drifts toward you.

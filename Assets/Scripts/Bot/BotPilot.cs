@@ -89,7 +89,7 @@ namespace Com.MMsGamingCo.Ricomet
 
         private void Decide(CometController comet)
         {
-            float hereDanger = Danger(comet.Position, comet.Radius, null);
+            float hereDanger = Danger(comet.Position, comet.Radius, null, false);
 
             // Best attack that still leaves a full charge to escape with afterwards.
             Plan bestSafeAttack = default;
@@ -170,9 +170,10 @@ namespace Com.MMsGamingCo.Ricomet
                     continue;
                 }
 
-                // Splitters need two hits; a hit is still progress.
+                // Splitters need two hits; a hit is still progress. Darts are the biggest
+                // threat, so killing one counts extra.
                 bool dies = enemy.Health <= stats.dashDamage;
-                plan.kills += dies ? 1f : 0.6f;
+                plan.kills += dies ? (enemy is DartEnemy ? 1.5f : 1f) : 0.6f;
                 if (dies) pathKills.Add(enemy);
             }
 
@@ -186,7 +187,7 @@ namespace Com.MMsGamingCo.Ricomet
                 plan.bossHit = true;
 
             Vector2 landing = path[path.Count - 1];
-            plan.landingDanger = Danger(landing, comet.Radius, pathKills);
+            plan.landingDanger = Danger(landing, comet.Radius, pathKills, true);
 
             // Shockwave clears the landing spot, so landings near groups are worth more.
             if (stats.shockwaveRadius > 0f)
@@ -250,8 +251,10 @@ namespace Com.MMsGamingCo.Ricomet
         /// <summary>
         /// How dangerous it is to be stopped at a point over the next moment.
         /// 0 = safe; 1+ = likely to get hit. Enemies in ignore are about to die.
+        /// forecast adds threats that haven't started yet (Darts in range), for picking
+        /// landing spots; it's off for "am I in danger right now", so it can't cause panic escapes.
         /// </summary>
-        private static float Danger(Vector2 point, float radius, HashSet<Enemy> ignore)
+        private static float Danger(Vector2 point, float radius, HashSet<Enemy> ignore, bool forecast)
         {
             float danger = 0f;
 
@@ -265,11 +268,22 @@ namespace Com.MMsGamingCo.Ricomet
                     continue;
                 }
 
-                if (enemy is DartEnemy dart && dart.IsThreatening)
+                if (enemy is DartEnemy dart)
                 {
-                    Vector2 chargeEnd = dart.Position + dart.ChargeDirection * dart.ChargeLength;
-                    if (Geometry2D.SweptCircleHit(dart.Position, chargeEnd, dart.Radius + 0.5f, point, radius))
-                        danger += 4f;
+                    if (dart.IsThreatening)
+                    {
+                        Vector2 chargeEnd = dart.Position + dart.ChargeDirection * dart.ChargeLength;
+                        if (Geometry2D.SweptCircleHit(dart.Position, chargeEnd, dart.Radius + 0.5f, point, radius))
+                            danger += 4f;
+                    }
+                    else if (forecast && dart.CanHurtComet)
+                    {
+                        // An approaching Dart will charge at wherever the comet is. Being in
+                        // range of it at all is a threat, before the warning even starts.
+                        float range = PrototypeTuning.Instance.dartChargeRange + 1f;
+                        if ((dart.Position - point).sqrMagnitude < range * range)
+                            danger += 0.5f;
+                    }
                 }
 
                 // Enemies keep moving toward us, so give them a buffer. Escapes start once an

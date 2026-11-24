@@ -64,7 +64,9 @@ namespace Com.MMsGamingCo.Ricomet
         [Tooltip("Energy refunded when a dash hits a boss.")]
         public float bossHitRefund = 0.75f;
         [Tooltip("Seconds to regain one charge while stopped.")]
-        public float secondsPerCharge = 2.5f;
+        public float secondsPerCharge = 2f;
+        [Tooltip("Recharge speed-up while below one charge (stranded).")]
+        public float emptyRegenMultiplier = 2f;
 
         [Header("Focus")]
         [Tooltip("Real seconds of slow-motion aiming when full.")]
@@ -77,6 +79,8 @@ namespace Com.MMsGamingCo.Ricomet
         [Header("Health")]
         public int maxShields = 3;
         public float invulnerableAfterHit = 1f;
+        [Tooltip("Shields repaired each time a wave is cleared.")]
+        public int shieldsRepairedPerWave = 1;
         [Tooltip("Grace period after a dash ends before contact damage applies.")]
         public float postDashGrace = 0.2f;
 
@@ -134,8 +138,8 @@ namespace Com.MMsGamingCo.Ricomet
         [Header("Dart")]
         public float dartApproachSpeed = 1.6f;
         public float dartChargeRange = 8f;
-        public float dartWindupTime = 0.7f;
-        public float dartChargeSpeed = 17f;
+        public float dartWindupTime = 0.85f;
+        public float dartChargeSpeed = 15f;
         public float dartChargeTime = 0.55f;
         public float dartRecoverTime = 1.1f;
         public float dartRadius = 0.45f;

@@ -31,7 +31,7 @@ namespace Com.MMsGamingCo.Ricomet
         public int defeatPoints = 5000;
 
         [Header("Beams")]
-        public float beamTelegraphTime = 1.1f;
+        public float beamTelegraphTime = 1.3f;
         public float beamActiveTime = 1.8f;
         public float beamRestTime = 2.2f;
         public float beamHalfWidth = 0.22f;

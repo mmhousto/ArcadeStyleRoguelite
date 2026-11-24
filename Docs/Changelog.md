@@ -31,6 +31,17 @@ refunds) and only attacks if it will still have a full charge to escape with. It
 last charge only when staying put means getting hit, preferring an escape that also kills.
 It also reacts to approaching enemies earlier.
 
+**Fourth playtest round** (back to reaching the boss on every seed, but arriving with about
+1 shield; 7 of 10 hits were Darts in waves 2-4, all while stranded under one charge):
+- Clearing a wave repairs 1 shield ("SHIELD REPAIRED"), so early mistakes don't snowball
+  into the boss.
+- Recharge 2.5s → 2.0s per charge, and twice as fast while below one charge, so being
+  stranded is a brief scare instead of a death sentence.
+- Darts: longer warning (0.7s → 0.85s) and slower charge (17 → 15).
+- Prism beam warning 1.1s → 1.3s.
+- Bot: kills Darts first, and avoids landing in range of a Dart that's about to charge.
+- Reports show shields left when the boss arrives.
+
 
 - **Playtest bot** (`BotPilot`, `BotDirector`): simulates 216 possible dashes (72 directions
   x 3 powers, with wall bounces and shield ricochets) and picks the best by kills and boss hits
