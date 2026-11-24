@@ -7,8 +7,9 @@ namespace Com.MMsGamingCo.Ricomet
     /// <summary>
     /// The playtest bot's aim. Every few frames it simulates a fan of dashes (with
     /// wall bounces and shield ricochets), scores each by kills and boss hits minus
-    /// how dangerous the landing spot is, and fires the best one. It keeps a charge
-    /// in reserve for escapes and dashes away when standing still gets dangerous.
+    /// how dangerous the landing spot is, and fires the best one. It predicts its
+    /// energy after each dash and only attacks if it will still have a full charge
+    /// to escape with; it spends its last charge only when staying put means a hit.
     /// </summary>
     public class BotPilot : IAimSource
     {
@@ -30,7 +31,7 @@ namespace Com.MMsGamingCo.Ricomet
         public float Power { get; private set; } = 1f;
         public bool DashRequested { get; private set; }
 
-        /// <summary>Last decision, for debugging: "attack", "boss", "escape" or "wait".</summary>
+        /// <summary>Last decision, for reports: attack, boss, escape, escape+attack, trapped or wait.</summary>
         public string LastDecision { get; private set; } = "wait";
 
         private float thinkTimer = 0f;
@@ -47,6 +48,8 @@ namespace Com.MMsGamingCo.Ricomet
             public float kills;
             public bool bossHit;
             public float landingDanger;
+            /// <summary>Predicted energy after the dash: spend one, plus kill and boss-hit refunds.</summary>
+            public float energyAfter;
         }
 
         #endregion
@@ -87,11 +90,13 @@ namespace Com.MMsGamingCo.Ricomet
         private void Decide(CometController comet)
         {
             float hereDanger = Danger(comet.Position, comet.Radius, null);
-            bool hasReserve = comet.Energy.Current >= 2f;
 
-            Plan bestAttack = default;
+            // Best attack that still leaves a full charge to escape with afterwards.
+            Plan bestSafeAttack = default;
+            Plan bestAnyAttack = default;
             Plan safest = default;
-            bestAttack.score = float.MinValue;
+            bestSafeAttack.score = float.MinValue;
+            bestAnyAttack.score = float.MinValue;
             safest.landingDanger = float.MaxValue;
 
             for (int d = 0; d < DirectionCount; d++)
@@ -102,29 +107,36 @@ namespace Com.MMsGamingCo.Ricomet
                 foreach (float power in Powers)
                 {
                     Plan plan = Evaluate(comet, direction, power);
-                    if (plan.score > bestAttack.score) bestAttack = plan;
-                    if (plan.landingDanger < safest.landingDanger ||
-                        (Mathf.Approximately(plan.landingDanger, safest.landingDanger) && plan.score > safest.score))
-                        safest = plan;
+
+                    if (plan.score > bestAnyAttack.score) bestAnyAttack = plan;
+                    if (plan.energyAfter >= 1f && plan.score > bestSafeAttack.score) bestSafeAttack = plan;
+
+                    // Safest landing; ties go to the one that leaves more energy, then more score.
+                    bool safer = plan.landingDanger < safest.landingDanger - 0.01f;
+                    bool tie = Mathf.Abs(plan.landingDanger - safest.landingDanger) <= 0.01f &&
+                        (plan.energyAfter > safest.energyAfter || (Mathf.Approximately(plan.energyAfter, safest.energyAfter) && plan.score > safest.score));
+                    if (safer || tie) safest = plan;
                 }
             }
 
-            // Boss hits refund energy, but landing somewhere dangerous with no reserve still kills you.
-            bool safeLanding = bestAttack.landingDanger < 0.4f;
-            bool bossWorthIt = bestAttack.bossHit && (hasReserve || safeLanding);
-            bool worthIt = bossWorthIt || bestAttack.kills >= 2f || (bestAttack.kills >= 1f && (hasReserve || safeLanding));
-            if (bestAttack.score >= KillScore * 0.5f && worthIt)
+            const float MinAttackScore = KillScore * 0.5f;
+
+            if (bestSafeAttack.score >= MinAttackScore && (bestSafeAttack.kills >= 1f || bestSafeAttack.bossHit))
             {
-                Fire(bestAttack, bestAttack.bossHit ? "boss" : "attack");
+                Fire(bestSafeAttack, bestSafeAttack.bossHit ? "boss" : "attack");
             }
-            else if (hereDanger >= EscapeDanger && safest.landingDanger < hereDanger)
+            else if (hereDanger >= EscapeDanger)
             {
-                Fire(safest, "escape");
-            }
-            else if (bestAttack.score >= KillScore * 0.5f && hereDanger >= EscapeDanger * 0.5f)
-            {
-                // Getting crowded and there's a kill on offer: take it even without a reserve.
-                Fire(bestAttack, "attack");
+                // About to get hit standing here: move, even if it spends the last charge.
+                // An attack that lands safer than here is better than a plain escape (kills refund).
+                bool attackIsSafer = bestAnyAttack.score >= MinAttackScore && bestAnyAttack.landingDanger < hereDanger &&
+                    bestAnyAttack.landingDanger <= safest.landingDanger + 0.5f;
+                if (attackIsSafer)
+                    Fire(bestAnyAttack, "escape+attack");
+                else if (safest.landingDanger < hereDanger)
+                    Fire(safest, "escape");
+                else
+                    LastDecision = "trapped";
             }
             else
             {
@@ -163,6 +175,11 @@ namespace Com.MMsGamingCo.Ricomet
                 plan.kills += dies ? 1f : 0.6f;
                 if (dies) pathKills.Add(enemy);
             }
+
+            float refunds = pathKills.Count * stats.killRefund;
+            if (plan.bossHit || (pathHitsBossCore && PrismBoss.Current != null && !PrismBoss.Current.IsInvulnerable))
+                refunds += PrototypeTuning.Instance.bossHitRefund;
+            plan.energyAfter = Mathf.Min(stats.maxCharges, comet.Energy.Current - 1f + refunds);
 
             // Core ricochets stop just outside the core, so PathHits can miss them.
             if (pathHitsBossCore && PrismBoss.Current != null && !PrismBoss.Current.IsInvulnerable)
@@ -255,8 +272,9 @@ namespace Com.MMsGamingCo.Ricomet
                         danger += 4f;
                 }
 
-                // Enemies keep moving toward us, so give them a buffer.
-                float reach = enemy.Radius + radius + 1.4f;
+                // Enemies keep moving toward us, so give them a buffer. Escapes start once an
+                // enemy is about 1.7 units away, early enough to react before contact.
+                float reach = enemy.Radius + radius + 2f;
                 float distance = (enemy.Position - point).magnitude;
                 if (distance < reach)
                     danger += (1f - distance / reach) * (enemy.IsStunned ? 0.6f : 2f);

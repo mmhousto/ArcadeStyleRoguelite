@@ -24,6 +24,13 @@ was stopped and out of energy):
   boss when low on energy, looks 1.2s ahead for beams, and checks each orb's whole path.
 - Playtest reports log what caused each hit (beam, orb, which enemy) and the energy left.
 
+**Third playtest round** (regression: the bot died in waves 1-4, every hit with under one
+charge left): the previous change let the bot spend its last charge on a single kill, which
+stranded it. The bot now predicts its energy after each dash (spend 1, plus kill and boss-hit
+refunds) and only attacks if it will still have a full charge to escape with. It spends its
+last charge only when staying put means getting hit, preferring an escape that also kills.
+It also reacts to approaching enemies earlier.
+
 
 - **Playtest bot** (`BotPilot`, `BotDirector`): simulates 216 possible dashes (72 directions
   x 3 powers, with wall bounces and shield ricochets) and picks the best by kills and boss hits
