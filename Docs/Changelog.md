@@ -42,6 +42,9 @@ It also reacts to approaching enemies earlier.
 - Bot: kills Darts first, and avoids landing in range of a Dart that's about to charge.
 - Reports show shields left when the boss arrives.
 
+**Result:** the bot clears Sector 1, Prism included, on all three playtest seeds (101, 202, 303).
+`BotPlaytest` is now the balance gate: run it after any change to enemies, waves, upgrades or bosses.
+
 
 - **Playtest bot** (`BotPilot`, `BotDirector`): simulates 216 possible dashes (72 directions
   x 3 powers, with wall bounces and shield ricochets) and picks the best by kills and boss hits
