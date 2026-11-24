@@ -10,6 +10,7 @@ namespace Com.MMsGamingCo.Core
     /// plays music with crossfades and plays sound effects from a small pool of sources.
     /// Put it on a prefab in your first scene. Settings UI talks to it through
     /// AudioPlayerSettings, so it no longer searches the scene for sliders every frame.
+    /// Without a mixer, volumes are applied to the audio sources directly.
     /// </summary>
     public class AudioManager : Singleton<AudioManager>
     {
@@ -44,6 +45,13 @@ namespace Com.MMsGamingCo.Core
         private AudioSource[] sfxSources;
         private int nextSfxSource = 0;
         private Coroutine musicFadeCoroutine;
+
+        // Used when there's no mixer: volumes go straight onto the sources.
+        private float masterVolume = 1f, musicVolume = 1f, sfxVolume = 1f;
+
+        private bool UseMixer { get { return masterMixer != null; } }
+        private float MusicGain { get { return UseMixer ? 1f : masterVolume * musicVolume; } }
+        private float SfxGain { get { return UseMixer ? 1f : masterVolume * sfxVolume; } }
 
         public AudioClip CurrentMusic
         {
@@ -121,7 +129,15 @@ namespace Com.MMsGamingCo.Core
 
         private void SetMixerVolume(string parameter, float volume)
         {
-            if (masterMixer == null || string.IsNullOrEmpty(parameter)) return;
+            if (!UseMixer)
+            {
+                if (parameter == masterParameter) masterVolume = Mathf.Clamp01(volume);
+                else if (parameter == musicParameter) musicVolume = Mathf.Clamp01(volume);
+                else if (parameter == sfxParameter) sfxVolume = Mathf.Clamp01(volume);
+                ApplyMusicGain();
+                return;
+            }
+            if (string.IsNullOrEmpty(parameter)) return;
 
             if (!masterMixer.SetFloat(parameter, AudioMath.LinearToDecibels(volume)))
                 Debug.LogWarning("AudioManager: mixer has no exposed parameter named " + parameter);
@@ -149,7 +165,7 @@ namespace Com.MMsGamingCo.Core
             activeMusicSource = 1 - activeMusicSource;
             AudioSource next = musicSources[activeMusicSource];
             next.clip = clip;
-            next.volume = fadeTime > 0 ? 0f : 1f;
+            next.volume = fadeTime > 0 ? 0f : MusicGain;
             next.Play();
 
             StartMusicFade(Crossfade(current, next, fadeTime));
@@ -160,6 +176,13 @@ namespace Com.MMsGamingCo.Core
         {
             if (fadeTime < 0) fadeTime = musicFadeTime;
             StartMusicFade(Crossfade(musicSources[activeMusicSource], null, fadeTime));
+        }
+
+        /// <summary>Re-applies volume to the music sources (no-mixer mode).</summary>
+        private void ApplyMusicGain()
+        {
+            if (musicSources == null || musicFadeCoroutine != null) return;
+            musicSources[activeMusicSource].volume = MusicGain;
         }
 
         public void PauseMusic(bool paused)
@@ -188,7 +211,7 @@ namespace Com.MMsGamingCo.Core
                 timer += Time.unscaledDeltaTime;
                 float t = Mathf.Clamp01(timer / fadeTime);
                 if (from != null) from.volume = Mathf.Lerp(fromStart, 0f, t);
-                if (to != null) to.volume = t;
+                if (to != null) to.volume = t * MusicGain;
                 yield return null;
             }
 
@@ -197,9 +220,8 @@ namespace Com.MMsGamingCo.Core
                 from.Stop();
                 from.clip = null;
             }
-            if (to != null) to.volume = 1f;
-
             musicFadeCoroutine = null;
+            if (to != null) to.volume = MusicGain;
         }
 
         #endregion
@@ -217,10 +239,21 @@ namespace Com.MMsGamingCo.Core
         {
             if (clip == null) return;
 
+            PlaySFXPitched(clip, volume, 1f + Random.Range(-pitchVariance, pitchVariance));
+        }
+
+        /// <summary>
+        /// Plays a 2D sound effect at an exact pitch (1 = normal). Handy for sounds that
+        /// climb with a combo.
+        /// </summary>
+        public void PlaySFXPitched(AudioClip clip, float volume, float pitch)
+        {
+            if (clip == null) return;
+
             AudioSource source = NextSfxSource();
             source.spatialBlend = 0f;
-            source.pitch = 1f + Random.Range(-pitchVariance, pitchVariance);
-            source.PlayOneShot(clip, volume);
+            source.pitch = Mathf.Clamp(pitch, 0.1f, 3f);
+            source.PlayOneShot(clip, volume * SfxGain);
         }
 
         /// <summary>
@@ -234,7 +267,7 @@ namespace Com.MMsGamingCo.Core
             source.transform.position = position;
             source.spatialBlend = 1f;
             source.pitch = 1f + Random.Range(-pitchVariance, pitchVariance);
-            source.PlayOneShot(clip, volume);
+            source.PlayOneShot(clip, volume * SfxGain);
         }
 
         /// <summary>Plays a random clip from the array.</summary>

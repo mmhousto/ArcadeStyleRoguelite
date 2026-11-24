@@ -11,6 +11,18 @@ Unity 6 (6000.3) URP project, iOS first, landscape, Steam port later. Arcade-sty
 - `Assets/Scripts/`: game code (namespace `Com.MMsGamingCo.Ricomet`).
 - `Docs/GameDesign.md`: game design document. Check it before building features.
 - `Docs/Prototype.md`: how to run and tune the current prototype.
+- `Art/Vector/`: SVG source art. `Tools/generate_art.py` exports glowing PNGs to
+  `Assets/Resources/Art/` (white, tinted in game). Edit the generator, then re-run it.
+- `Tools/generate_audio.py`: placeholder sound effects and music, written to
+  `Assets/Resources/Audio/`. Replace a WAV with a real sound of the same name.
+- `Assets/Resources/Fonts/`: Orbitron (SIL OFL, license file alongside).
+
+## Runtime-built scenes
+
+Scenes hold one bootstrap object (`MainMenuBootstrap`, `PrototypeBootstrap`); everything
+else, including uGUI, is built from code. Build UI with `UIFactory` and `UITheme`, load art
+with `SpriteLibrary` / `NeonShape`, play sounds with `GameAudio`. Decorative UI graphics must
+not be raycast targets, so touches pass through to aiming.
 
 ## Versions and branches
 

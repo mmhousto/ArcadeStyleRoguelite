@@ -31,7 +31,7 @@ namespace Com.MMsGamingCo.Ricomet
         {
             enemyId = "enemy_dart";
             radius = tuning.dartRadius;
-            outline = ShapeFactory.CreatePolygon(transform, "Outline", ShapeFactory.Arrow(radius * 1.5f, radius * 0.75f), NeonColors.Enemy, 0.09f, 6);
+            outline = NeonShape.Create(transform, "dart", radius * 1.5f, ShapeFactory.Arrow(radius * 1.5f, radius * 0.75f), NeonColors.Enemy, 6);
 
             telegraph = ShapeFactory.CreateLine(transform, "Telegraph", NeonColors.Danger, 0.05f, 4);
             telegraph.useWorldSpace = true;
@@ -103,7 +103,7 @@ namespace Com.MMsGamingCo.Ricomet
             state = newState;
             stateTimer = duration;
             telegraph.enabled = newState == DartState.Windup;
-            ShapeFactory.SetColor(outline, BaseColor());
+            outline.SetColor(BaseColor());
         }
 
         private void DrawTelegraph()

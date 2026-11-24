@@ -73,8 +73,12 @@ namespace Com.MMsGamingCo.Ricomet
             if (pointer.press.wasPressedThisFrame)
             {
                 AnyPressed = true;
-                pointerAiming = true;
-                DragStart = position;
+                // A press that starts on a button (e.g. pause) is for the UI, not an aim.
+                if (!UIFactory.IsPointerOverUI(position))
+                {
+                    pointerAiming = true;
+                    DragStart = position;
+                }
             }
 
             if (!pointerAiming) return false;

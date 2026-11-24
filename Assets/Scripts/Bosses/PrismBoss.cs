@@ -81,7 +81,7 @@ namespace Com.MMsGamingCo.Ricomet
         private float minionTimer;
         private float volleyOffset;
 
-        private LineRenderer innerCrystal;
+        private NeonShape innerCrystal;
         private readonly List<LineRenderer> shieldSegments = new List<LineRenderer>();
         private readonly List<LineRenderer> beams = new List<LineRenderer>();
 
@@ -177,8 +177,8 @@ namespace Com.MMsGamingCo.Ricomet
             points = defeatPoints;
 
             // Two counter-rotating triangles read as a crystal.
-            outline = ShapeFactory.CreatePolygon(transform, "Crystal", ShapeFactory.Triangle(coreRadius * 1.15f), NeonColors.Enemy, 0.14f, 6);
-            innerCrystal = ShapeFactory.CreatePolygon(transform, "Inner", ShapeFactory.RegularPolygon(coreRadius * 0.75f, 3, 180f), NeonColors.White, 0.1f, 7);
+            outline = NeonShape.Create(transform, "prism_outer", coreRadius * 1.15f, ShapeFactory.Triangle(coreRadius * 1.15f), NeonColors.Enemy, 6, 0.14f);
+            innerCrystal = NeonShape.Create(transform, "prism_inner", coreRadius * 0.8f, ShapeFactory.RegularPolygon(coreRadius * 0.75f, 3, 180f), NeonColors.White, 7, 0.1f);
 
             shield = new RotatingShield(shieldRadius, RotatingShield.Pattern(phases[0].shieldPattern));
         }
@@ -309,6 +309,7 @@ namespace Com.MMsGamingCo.Ricomet
                     SetBeamsVisible(false);
                     if (beamTimer <= 0f)
                     {
+                        GameAudio.Play(GameAudio.BeamCharge, 0.5f, 0f);
                         beamState = BeamState.Telegraph;
                         beamTimer = beamTelegraphTime;
                         beamAngle = UnityEngine.Random.Range(0f, 360f);
@@ -370,6 +371,7 @@ namespace Com.MMsGamingCo.Ricomet
             volleyTimer = settings.volleyInterval;
             volleyOffset += 360f / Mathf.Max(1, settings.volleyCount) * 0.5f;
             EnemyProjectiles.FireRing(Position, settings.volleyCount, settings.volleySpeed, volleyOffset);
+            GameAudio.Play(GameAudio.OrbFire, 0.6f);
         }
 
         private void UpdateMinions(float deltaTime)
@@ -411,8 +413,8 @@ namespace Com.MMsGamingCo.Ricomet
                 segment.transform.localRotation = Quaternion.Euler(0f, 0f, shield.Rotation);
 
             // Dim while invulnerable so the player knows hits won't count.
-            float alpha = IsInvulnerable ? 0.35f + 0.25f * Mathf.Sin(Time.time * 20f) : 1f;
-            ShapeFactory.SetColor(innerCrystal, NeonColors.WithAlpha(NeonColors.White, alpha));
+            float alpha = !IsInvulnerable ? 1f : GameSettings.ReduceFlashing ? 0.45f : 0.35f + 0.25f * Mathf.Sin(Time.time * 20f);
+            innerCrystal.SetColor(NeonColors.WithAlpha(NeonColors.White, alpha));
             foreach (LineRenderer segment in shieldSegments)
                 ShapeFactory.SetColor(segment, NeonColors.WithAlpha(NeonColors.Enemy, 0.5f + 0.5f * alpha));
         }
@@ -470,7 +472,7 @@ namespace Com.MMsGamingCo.Ricomet
                 float width = active ? beamHalfWidth * 2f : 0.05f;
                 beam.startWidth = width;
                 beam.endWidth = width;
-                float alpha = active ? 1f : 0.35f + 0.25f * Mathf.Sin(Time.time * 25f);
+                float alpha = active ? 1f : GameSettings.ReduceFlashing ? 0.45f : 0.35f + 0.25f * Mathf.Sin(Time.time * 25f);
                 ShapeFactory.SetColor(beam, NeonColors.WithAlpha(NeonColors.Danger, alpha));
             }
         }

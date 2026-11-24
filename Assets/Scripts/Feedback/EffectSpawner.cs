@@ -35,6 +35,8 @@ namespace Com.MMsGamingCo.Ricomet
         {
             if (_instance != null)
                 _instance.GetBurst().Play(position, color, 0.3f, 1.6f, 0.35f, true);
+            ParticleBursts.Burst(position, color, 12);
+            Arena.Ripple(position, 0.12f);
         }
 
         /// <summary>Ring where the comet stops, out to the knockback radius.</summary>
@@ -42,6 +44,7 @@ namespace Com.MMsGamingCo.Ricomet
         {
             if (_instance != null)
                 _instance.GetBurst().Play(position, NeonColors.WithAlpha(NeonColors.Player, 0.7f), 0.4f, radius, 0.22f, false);
+            Arena.Ripple(position, 0.08f);
         }
 
         /// <summary>Shrinking ring that warns where an enemy is about to appear.</summary>
@@ -56,6 +59,8 @@ namespace Com.MMsGamingCo.Ricomet
         {
             if (_instance != null)
                 _instance.GetBurst().Play(position, NeonColors.Player, 0.3f, radius, 0.3f, true);
+            ParticleBursts.Burst(position, NeonColors.Player, 24, 1.5f);
+            Arena.Ripple(position, 0.3f);
         }
 
         /// <summary>Jagged bolt between two points.</summary>
@@ -70,6 +75,8 @@ namespace Com.MMsGamingCo.Ricomet
         {
             if (_instance != null)
                 _instance.GetBurst().Play(position, NeonColors.Danger, 0.5f, 3.5f, 0.5f, true);
+            ParticleBursts.Burst(position, NeonColors.Danger, 30, 1.3f);
+            Arena.Ripple(position, 0.35f);
         }
 
         private BurstEffect GetBurst()

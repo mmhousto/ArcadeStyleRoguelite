@@ -51,7 +51,7 @@ namespace Com.MMsGamingCo.Ricomet
         public bool CanHurtComet { get { return IsAlive && !IsStunned && DealsContactDamage; } }
 
         protected PrototypeTuning tuning;
-        protected LineRenderer outline;
+        protected NeonShape outline;
         private float flashTimer = 0f;
         private float stunTimer = 0f;
         private Vector2 knockbackVelocity = Vector2.zero;
@@ -99,7 +99,7 @@ namespace Com.MMsGamingCo.Ricomet
             if (flashTimer > 0f)
             {
                 flashTimer -= Time.unscaledDeltaTime;
-                ShapeFactory.SetColor(outline, flashTimer > 0f ? NeonColors.White : BaseColor());
+                outline.SetColor(flashTimer > 0f && !GameSettings.ReduceFlashing ? NeonColors.White : BaseColor());
             }
         }
 
@@ -145,7 +145,7 @@ namespace Com.MMsGamingCo.Ricomet
             flashTimer = 0f;
             stunTimer = 0f;
             knockbackVelocity = Vector2.zero;
-            ShapeFactory.SetColor(outline, BaseColor());
+            outline.SetColor(BaseColor());
         }
 
         public virtual void OnDespawned()

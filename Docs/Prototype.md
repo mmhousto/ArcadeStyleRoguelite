@@ -1,16 +1,27 @@
-# Ricomet Prototype (v0.4)
+# Ricomet Prototype (v0.5)
 
 Gray-box prototype. v0.1 asked **is dashing fun?** v0.2 added the roguelite run loop
-(waves and upgrades), v0.3 the Sector 1 boss, and v0.4 a tutorial and a playtest bot.
+(waves and upgrades), v0.3 the Sector 1 boss, v0.4 a tutorial and a playtest bot, and v0.5
+neon art, real UI, menus, settings and placeholder audio.
 Everything is built from code at runtime: no prefabs, no art, no UI assets.
 
 ## Run it
 
 1. Open the project in Unity 6000.3.
-2. Open `Assets/Scenes/Prototype.unity` (it's first in Build Settings).
-3. Press Play. Set the Game view to a landscape size (e.g. 1920x1080 or an iPhone landscape preset).
+2. Open `Assets/Scenes/MainMenu.unity` (first in Build Settings) and press Play, or use
+   **Ricomet > Playtest > Play From Main Menu**. `Prototype.unity` still starts a run directly.
+3. Set the Game view to a landscape size (e.g. 1920x1080 or an iPhone landscape preset).
 
-To try it on an iPhone, build for iOS as normal; the prototype scene is the first scene.
+The first time Unity opens this version it imports the new PNG, WAV and TTF files and
+creates `.meta` files for them. Commit those.
+
+## Art and audio
+
+- Shapes live in `Tools/generate_art.py` (SVG sources are written to `Art/Vector/`). Run
+  `python3 Tools/generate_art.py` (needs `pip install cairosvg pillow numpy`) to re-export.
+  Sprites are white and tinted in game, so the color rules stay in code.
+- Sounds come from `python3 Tools/generate_audio.py` (needs `numpy`). To use a real sound,
+  drop a WAV with the same name into `Assets/Resources/Audio/Sfx` or `/Music`.
 
 ## Controls
 

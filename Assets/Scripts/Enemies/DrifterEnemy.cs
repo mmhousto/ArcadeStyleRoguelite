@@ -21,7 +21,7 @@ namespace Com.MMsGamingCo.Ricomet
             enemyId = sizeScale < 1f ? "enemy_drifter_mini" : "enemy_drifter";
             radius = tuning.drifterRadius * sizeScale;
             points = sizeScale < 1f ? 50 : 100;
-            outline = ShapeFactory.CreatePolygon(transform, "Outline", ShapeFactory.Triangle(radius * 1.2f), NeonColors.Enemy, 0.09f, 6);
+            outline = NeonShape.Create(transform, "drifter", radius * 1.2f, ShapeFactory.Triangle(radius * 1.2f), NeonColors.Enemy, 6);
         }
 
         public override void OnSpawned()

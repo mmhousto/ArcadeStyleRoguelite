@@ -17,7 +17,7 @@ namespace Com.MMsGamingCo.Ricomet
             radius = tuning.splitterRadius;
             maxHealth = 2f;
             points = 200;
-            outline = ShapeFactory.CreatePolygon(transform, "Outline", ShapeFactory.RegularPolygon(radius, 6, 30f), NeonColors.Enemy, 0.1f, 6);
+            outline = NeonShape.Create(transform, "splitter", radius, ShapeFactory.RegularPolygon(radius, 6, 30f), NeonColors.Enemy, 6);
         }
 
         protected override void Tick(float deltaTime)
@@ -27,9 +27,10 @@ namespace Com.MMsGamingCo.Ricomet
             transform.position = Position + velocity * deltaTime;
             outline.transform.Rotate(0f, 0f, 30f * deltaTime);
 
-            // Shrinks a little once damaged, so players can see it's nearly done.
-            float scale = Health < maxHealth ? 0.8f : 1f;
-            outline.transform.localScale = Vector3.one * scale;
+            // Cracks and shrinks a little once damaged, so players can see it's nearly done.
+            bool damaged = Health < maxHealth;
+            outline.transform.localScale = Vector3.one * (damaged ? 0.85f : 1f);
+            outline.SetArt(damaged ? "splitter_cracked" : "splitter");
         }
 
         protected override void OnDied()

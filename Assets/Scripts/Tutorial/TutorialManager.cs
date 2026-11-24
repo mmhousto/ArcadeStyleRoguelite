@@ -22,7 +22,9 @@ namespace Com.MMsGamingCo.Ricomet
         private TutorialSave save;
         private string doneText = "";
         private float doneTimer = 0f;
-        private GUIStyle textStyle, labelStyle;
+        private UnityEngine.UI.Image panel;
+        private UnityEngine.UI.Image panelFrame;
+        private UnityEngine.UI.Text headerText, hintText;
 
         #endregion
 
@@ -34,6 +36,7 @@ namespace Com.MMsGamingCo.Ricomet
             _instance = this;
             save = Com.MMsGamingCo.Core.SaveSystem.Load<TutorialSave>(TutorialSave.Slot);
             sequence = new TutorialSequence(TutorialSteps.All(), save.completedSteps);
+            BuildPanel();
         }
 
         private void OnDestroy()
@@ -78,42 +81,54 @@ namespace Com.MMsGamingCo.Ricomet
             }
         }
 
-        private void OnGUI()
+        private void LateUpdate()
         {
-            if (!IsRunning()) return;
+            bool running = IsRunning();
+            bool showHint = running && sequence.IsVisible(context);
+            bool showDone = running && !showHint && doneTimer > 0f;
 
-            bool showHint = sequence.IsVisible(context);
-            if (!showHint && doneTimer <= 0f) return;
+            panel.gameObject.SetActive(showHint || showDone);
+            if (!showHint && !showDone) return;
 
-            BuildStyles();
-            GUI.matrix = Matrix4x4.Scale(new Vector3(GuiInput.Scale, GuiInput.Scale, 1f));
-
-            float width = Mathf.Min(1100f, GuiInput.Width - 120f);
-            Rect safe = GuiInput.SafeRect();
-            // Below the reroll button while picking; above the bottom HUD otherwise.
-            float y = context.pickerOpen ? 895f : safe.yMax - 250f;
-            Rect panel = new Rect((GuiInput.Width - width) * 0.5f, y, width, 135f);
-
-            if (showHint)
-            {
-                GUI.color = new Color(0.02f, 0.03f, 0.08f, 0.82f);
-                GUI.DrawTexture(panel, Texture2D.whiteTexture);
-                GUI.color = new Color(0f, 0.94f, 1f);
-                GUI.DrawTexture(new Rect(panel.x, panel.y, 8f, panel.height), Texture2D.whiteTexture);
-
-                GUI.color = new Color(0f, 0.94f, 1f, 0.8f);
-                GUI.Label(new Rect(panel.x + 30f, panel.y + 8f, 300f, 30f), "HOW TO PLAY", labelStyle);
-                GUI.color = Color.white;
-                GUI.Label(new Rect(panel.x + 30f, panel.y + 36f, panel.width - 60f, 95f), sequence.Current.text, textStyle);
-            }
+            // While picking, sit bottom-left beside the reroll button; otherwise bottom center.
+            RectTransform rect = panel.rectTransform;
+            if (context.pickerOpen)
+                UIFactory.Place(rect, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(40f, 40f), new Vector2(620f, 170f));
             else
-            {
-                GUI.color = new Color(1f, 0.9f, 0f, Mathf.Clamp01(doneTimer / 0.3f));
-                GUI.Label(panel, doneText, Centered(textStyle));
-            }
+                UIFactory.Place(rect, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 110f), new Vector2(1150f, 140f));
 
-            GUI.color = Color.white;
-            GUI.matrix = Matrix4x4.identity;
+            headerText.gameObject.SetActive(showHint);
+            hintText.text = showHint ? sequence.Current.text : doneText;
+            hintText.color = showHint ? UITheme.White : UITheme.Yellow;
+            hintText.alignment = showHint ? TextAnchor.MiddleLeft : TextAnchor.MiddleCenter;
+            // "Nice!" floats on its own, without the panel behind it.
+            panel.enabled = showHint;
+            if (panelFrame != null) panelFrame.enabled = showHint;
+            hintText.canvasRenderer.SetAlpha(showHint ? 1f : Mathf.Clamp01(doneTimer / 0.3f));
+        }
+
+        private void BuildPanel()
+        {
+            Canvas canvas = UIFactory.CreateCanvas("Tutorial Canvas", 25, transform);
+            RectTransform safeArea = UIFactory.CreateSafeArea(canvas.transform);
+
+            panel = UIFactory.CreatePanel(safeArea, UITheme.Cyan, UITheme.PanelFill);
+            Transform frame = panel.transform.Find("Frame");
+            panelFrame = frame != null ? frame.GetComponent<UnityEngine.UI.Image>() : null;
+            headerText = UIFactory.CreateText(panel.transform, "HOW TO PLAY", 22, UITheme.Cyan, TextAnchor.UpperLeft);
+            headerText.rectTransform.anchorMin = new Vector2(0f, 1f);
+            headerText.rectTransform.anchorMax = new Vector2(1f, 1f);
+            headerText.rectTransform.pivot = new Vector2(0f, 1f);
+            headerText.rectTransform.offsetMin = new Vector2(30f, -44f);
+            headerText.rectTransform.offsetMax = new Vector2(-30f, -14f);
+
+            hintText = UIFactory.CreateText(panel.transform, "", 34, UITheme.White, TextAnchor.MiddleLeft, true, false);
+            hintText.rectTransform.anchorMin = Vector2.zero;
+            hintText.rectTransform.anchorMax = Vector2.one;
+            hintText.rectTransform.offsetMin = new Vector2(30f, 10f);
+            hintText.rectTransform.offsetMax = new Vector2(-30f, -40f);
+
+            panel.gameObject.SetActive(false);
         }
 
         #endregion
@@ -198,21 +213,6 @@ namespace Com.MMsGamingCo.Ricomet
         private void OnUpgradeChosen()
         {
             context.upgradesTaken++;
-        }
-
-        private void BuildStyles()
-        {
-            if (textStyle != null) return;
-
-            textStyle = new GUIStyle(GUI.skin.label) { fontSize = 38, fontStyle = FontStyle.Bold, wordWrap = true };
-            textStyle.normal.textColor = Color.white;
-            labelStyle = new GUIStyle(GUI.skin.label) { fontSize = 22, fontStyle = FontStyle.Bold };
-            labelStyle.normal.textColor = Color.white;
-        }
-
-        private static GUIStyle Centered(GUIStyle style)
-        {
-            return new GUIStyle(style) { alignment = TextAnchor.MiddleCenter };
         }
 
         #endregion

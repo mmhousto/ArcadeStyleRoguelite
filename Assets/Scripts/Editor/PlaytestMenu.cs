@@ -13,6 +13,7 @@ namespace Com.MMsGamingCo.Ricomet.Editor
     public static class PlaytestMenu
     {
         private const string PrototypeScene = "Assets/Scenes/Prototype.unity";
+        private const string MainMenuScene = "Assets/Scenes/MainMenu.unity";
 
         static PlaytestMenu()
         {
@@ -30,10 +31,21 @@ namespace Com.MMsGamingCo.Ricomet.Editor
             Play(true);
         }
 
-        [MenuItem("Ricomet/Playtest/Play Prototype", false, 2)]
+        [MenuItem("Ricomet/Playtest/Play Run Scene", false, 2)]
         public static void PlayMyself()
         {
             Play(false);
+        }
+
+        [MenuItem("Ricomet/Playtest/Play From Main Menu", false, 3)]
+        public static void PlayFromMenu()
+        {
+            if (EditorApplication.isPlaying) return;
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+
+            SessionState.SetBool(PrototypeBootstrap.WatchBotKey, false);
+            EditorSceneManager.OpenScene(MainMenuScene);
+            EditorApplication.EnterPlaymode();
         }
 
         [MenuItem("Ricomet/Playtest/Run Bot Playtests (Test Runner)", false, 20)]

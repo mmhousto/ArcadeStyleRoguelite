@@ -1,30 +1,41 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace Com.MMsGamingCo.Ricomet
 {
 
     /// <summary>
-    /// Gray-box upgrade picker shown between waves: three cards, tap one to take it.
-    /// Gamepad: d-pad to move, A to take, X/Y to reroll. Keyboard: 1-3, arrows, Enter, R.
+    /// Upgrade picker shown between waves: three neon cards with icons. Tap a card, or
+    /// use the d-pad / arrows and A / Enter. Number keys 1-3 pick directly, R or Y rerolls.
     /// </summary>
     public class UpgradePickerUI : MonoBehaviour
     {
-        private const float CardWidth = 380f;
-        private const float CardHeight = 460f;
-        private const float CardGap = 40f;
         private const float InputDelay = 0.25f;
+        private const int CardCount = 3;
 
+        private class Card
+        {
+            public Button button;
+            public Image frame;
+            public Image icon;
+            public Text rarity, title, level, description;
+        }
+
+        public bool IsOpen { get; private set; }
+
+        private RectTransform root;
+        private Text titleText;
+        private readonly Card[] cards = new Card[CardCount];
+        private Button rerollButton;
+        private Text rerollText;
         private List<UpgradeDefinition> offer = new List<UpgradeDefinition>();
-        private bool isOpen = false;
-        private int selected = 0;
-        private float openTimer = 0f;
-        // Only a press that starts after the picker opens can pick a card.
-        private bool pressStartedWhileOpen = false;
-        private GUIStyle titleStyle, nameStyle, bodyStyle, tagStyle, buttonStyle;
+        private float openTimer;
 
-        public bool IsOpen { get { return isOpen; } }
+        private void Awake()
+        {
+            Build();
+        }
 
         private void OnEnable()
         {
@@ -38,163 +49,121 @@ namespace Com.MMsGamingCo.Ricomet
             WaveDirector.upgradeChosen -= Close;
         }
 
+        private void Update()
+        {
+            if (!IsOpen) return;
+
+            openTimer += Time.unscaledDeltaTime;
+            bool ready = openTimer >= InputDelay;
+            foreach (Card card in cards) card.button.interactable = ready && card.button.gameObject.activeSelf;
+            rerollButton.interactable = ready && WaveDirector.Instance != null && WaveDirector.Instance.RerollsLeft > 0;
+            if (!ready) return;
+
+            int number = GameInput.NumberPressed();
+            if (number >= 0) Choose(number);
+            else if (GameInput.RerollPressed()) Reroll();
+        }
+
         private void Open(List<UpgradeDefinition> newOffer)
         {
             offer = new List<UpgradeDefinition>(newOffer);
-            selected = Mathf.Clamp(selected, 0, offer.Count - 1);
-            if (!isOpen)
+            bool wasOpen = IsOpen;
+            IsOpen = true;
+            root.gameObject.SetActive(true);
+            if (!wasOpen) openTimer = 0f;
+
+            WaveDirector director = WaveDirector.Instance;
+            titleText.text = director != null && director.IsBossFight == false && director.CurrentPhase == WaveDirector.Phase.Picking
+                ? "WAVE " + director.WaveNumber + " CLEAR" : "CHOOSE AN UPGRADE";
+
+            UpgradeInventory inventory = RunManager.Instance != null ? RunManager.Instance.Inventory : null;
+            for (int i = 0; i < CardCount; i++)
             {
-                openTimer = 0f;
-                pressStartedWhileOpen = false;
+                bool used = i < offer.Count;
+                cards[i].button.gameObject.SetActive(used);
+                if (used) Fill(cards[i], offer[i], inventory);
             }
-            isOpen = true;
+
+            rerollText.text = "REROLL (" + (director != null ? director.RerollsLeft : 0) + ")";
+            UIFactory.Select(cards[0].button);
         }
 
         private void Close()
         {
-            isOpen = false;
-        }
-
-        private void Update()
-        {
-            if (!isOpen || WaveDirector.Instance == null) return;
-
-            openTimer += Time.unscaledDeltaTime;
-            if (openTimer < InputDelay) return;
-
-            if (GuiInput.PointerPressed) pressStartedWhileOpen = true;
-
-            // Taps
-            if (pressStartedWhileOpen && GuiInput.PointerReleased)
-            {
-                for (int i = 0; i < offer.Count; i++)
-                {
-                    if (GuiInput.Tapped(CardRect(i)))
-                    {
-                        Choose(i);
-                        return;
-                    }
-                }
-                if (GuiInput.Tapped(RerollRect()))
-                    WaveDirector.Instance.Reroll();
-            }
-
-            // Gamepad and keyboard
-            int move = GuiInput.HorizontalPressed();
-            if (move != 0) selected = (selected + move + offer.Count) % offer.Count;
-
-            if (Keyboard.current != null)
-            {
-                if (Keyboard.current.digit1Key.wasPressedThisFrame) { Choose(0); return; }
-                if (Keyboard.current.digit2Key.wasPressedThisFrame) { Choose(1); return; }
-                if (Keyboard.current.digit3Key.wasPressedThisFrame) { Choose(2); return; }
-            }
-
-            if (GuiInput.ConfirmPressed()) Choose(selected);
-            else if (GuiInput.AltPressed()) WaveDirector.Instance.Reroll();
+            IsOpen = false;
+            root.gameObject.SetActive(false);
         }
 
         private void Choose(int index)
         {
-            if (index < 0 || index >= offer.Count) return;
+            if (index < 0 || index >= offer.Count || WaveDirector.Instance == null) return;
             WaveDirector.Instance.ChooseUpgrade(offer[index]);
         }
 
-        private void OnGUI()
+        private void Reroll()
         {
-            if (!isOpen || WaveDirector.Instance == null) return;
-
-            BuildStyles();
-            GUI.matrix = Matrix4x4.Scale(new Vector3(GuiInput.Scale, GuiInput.Scale, 1f));
-            float width = GuiInput.Width;
-
-            GUI.color = new Color(0.02f, 0.02f, 0.06f, 0.75f);
-            GUI.DrawTexture(new Rect(0f, 0f, width, GuiInput.ReferenceHeight), Texture2D.whiteTexture);
-
-            GUI.color = Color.white;
-            GUI.Label(new Rect(0f, 110f, width, 80f), "WAVE " + WaveDirector.Instance.WaveNumber + " CLEAR", titleStyle);
-            GUI.color = new Color(1f, 1f, 1f, 0.7f);
-            GUI.Label(new Rect(0f, 185f, width, 50f), "Choose an upgrade", bodyCentered());
-
-            UpgradeInventory inventory = RunManager.Instance != null ? RunManager.Instance.Inventory : null;
-            for (int i = 0; i < offer.Count; i++)
-                DrawCard(CardRect(i), offer[i], inventory, i == selected);
-
-            int rerolls = WaveDirector.Instance.RerollsLeft;
-            Color rerollColor = rerolls > 0 ? new Color(1f, 0.9f, 0f) : new Color(0.5f, 0.5f, 0.5f);
-            GuiInput.DrawButton(RerollRect(), "Reroll (" + rerolls + ")", rerollColor, false, buttonStyle);
-
-            GUI.color = Color.white;
-            GUI.matrix = Matrix4x4.identity;
+            if (WaveDirector.Instance != null && WaveDirector.Instance.Reroll())
+                GameAudio.Play(GameAudio.UiSelect, 0.7f, 0f);
         }
 
-        private void DrawCard(Rect rect, UpgradeDefinition upgrade, UpgradeInventory inventory, bool highlighted)
+        private static void Fill(Card card, UpgradeDefinition upgrade, UpgradeInventory inventory)
         {
-            Color rarityColor = RarityColor(upgrade.rarity);
-
-            GUI.color = NeonColors.WithAlpha(rarityColor, highlighted ? 0.22f : 0.1f);
-            GUI.DrawTexture(rect, Texture2D.whiteTexture);
-            GuiInput.DrawOutline(rect, rarityColor, highlighted ? 5f : 3f);
-
-            float x = rect.x + 24f, w = rect.width - 48f;
-
-            GUI.color = rarityColor;
-            GUI.Label(new Rect(x, rect.y + 24f, w, 36f), upgrade.rarity.ToString().ToUpper(), tagStyle);
-
-            GUI.color = Color.white;
-            GUI.Label(new Rect(x, rect.y + 64f, w, 70f), upgrade.displayName, nameStyle);
+            Color rarityColor = UITheme.RarityColor(upgrade.rarity);
+            card.frame.transform.Find("Frame").GetComponent<Image>().color = rarityColor;
+            card.icon.sprite = SpriteLibrary.UpgradeIcon(upgrade.id);
+            card.icon.color = rarityColor;
+            card.icon.enabled = card.icon.sprite != null;
+            card.rarity.text = upgrade.rarity.ToString().ToUpper();
+            card.rarity.color = rarityColor;
+            card.title.text = upgrade.displayName.ToUpper();
 
             int owned = inventory != null ? inventory.GetStacks(upgrade.id) : 0;
-            string level = owned == 0 ? "NEW" : "Level " + (owned + 1) + " / " + upgrade.maxStacks;
-            GUI.color = owned == 0 ? new Color(1f, 0.9f, 0f) : new Color(0f, 0.94f, 1f);
-            GUI.Label(new Rect(x, rect.y + 134f, w, 36f), level, tagStyle);
-
-            GUI.color = new Color(1f, 1f, 1f, 0.85f);
-            GUI.Label(new Rect(x, rect.y + 190f, w, 200f), upgrade.description, bodyStyle);
-
-            GUI.color = new Color(1f, 1f, 1f, 0.4f);
-            GUI.Label(new Rect(x, rect.yMax - 56f, w, 36f), string.Join("  ", upgrade.tags).ToUpper(), tagStyle);
+            card.level.text = owned == 0 ? "NEW" : "LEVEL " + (owned + 1) + " / " + upgrade.maxStacks;
+            card.level.color = owned == 0 ? UITheme.Yellow : UITheme.Cyan;
+            card.description.text = upgrade.description;
         }
 
-        private Rect CardRect(int index)
+        private void Build()
         {
-            float total = offer.Count * CardWidth + (offer.Count - 1) * CardGap;
-            float startX = (GuiInput.Width - total) * 0.5f;
-            return new Rect(startX + index * (CardWidth + CardGap), 270f, CardWidth, CardHeight);
-        }
+            Canvas canvas = UIFactory.CreateCanvas("Upgrade Picker Canvas", 20, transform);
+            root = UIFactory.CreateRect("Upgrade Picker", canvas.transform);
+            UIFactory.Stretch(root);
+            UIFactory.CreateBackdrop(root);
 
-        private Rect RerollRect()
-        {
-            return new Rect((GuiInput.Width - 320f) * 0.5f, 780f, 320f, 90f);
-        }
+            titleText = UIFactory.CreateText(root, "CHOOSE AN UPGRADE", 76, UITheme.White, TextAnchor.MiddleCenter);
+            UIFactory.Place(titleText.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -70f), new Vector2(1600f, 100f));
+            Text subtitle = UIFactory.CreateText(root, "Choose one", 36, UITheme.Dim, TextAnchor.MiddleCenter, false, false);
+            UIFactory.Place(subtitle.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -160f), new Vector2(1600f, 50f));
 
-        public static Color RarityColor(UpgradeRarity rarity)
-        {
-            switch (rarity)
+            const float cardWidth = 420f, cardHeight = 600f, gap = 50f;
+            float startX = -(cardWidth + gap);
+            for (int i = 0; i < CardCount; i++)
             {
-                case UpgradeRarity.Rare: return new Color(0.2f, 0.7f, 1f);
-                case UpgradeRarity.Epic: return new Color(0.75f, 0.35f, 1f);
-                case UpgradeRarity.Legendary: return new Color(1f, 0.8f, 0.1f);
-                default: return new Color(0.85f, 0.85f, 0.9f);
+                int index = i;
+                Card card = new Card();
+                card.button = UIFactory.CreateButton(root, "", UITheme.White, () => Choose(index));
+                card.frame = (Image)card.button.targetGraphic;
+                UIFactory.Place((RectTransform)card.button.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(startX + i * (cardWidth + gap), 10f), new Vector2(cardWidth, cardHeight));
+
+                Transform t = card.button.transform;
+                card.rarity = UIFactory.CreateText(t, "", 28, UITheme.White, TextAnchor.MiddleCenter);
+                UIFactory.Place(card.rarity.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -30f), new Vector2(380f, 40f));
+                card.icon = UIFactory.CreateImage(t, null, UITheme.White);
+                UIFactory.Place(card.icon.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -80f), new Vector2(170f, 170f));
+                card.title = UIFactory.CreateText(t, "", 44, UITheme.White, TextAnchor.MiddleCenter);
+                UIFactory.Place(card.title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -265f), new Vector2(390f, 60f));
+                card.level = UIFactory.CreateText(t, "", 28, UITheme.Yellow, TextAnchor.MiddleCenter);
+                UIFactory.Place(card.level.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -325f), new Vector2(380f, 40f));
+                card.description = UIFactory.CreateText(t, "", 30, UITheme.White, TextAnchor.UpperCenter, false, false);
+                UIFactory.Place(card.description.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -385f), new Vector2(360f, 190f));
+                cards[i] = card;
             }
-        }
 
-        private void BuildStyles()
-        {
-            if (titleStyle != null) return;
+            rerollButton = UIFactory.CreateButton(root, "REROLL", UITheme.Yellow, Reroll, 36);
+            UIFactory.Place((RectTransform)rerollButton.transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 60f), new Vector2(380f, 100f));
+            rerollText = rerollButton.GetComponentInChildren<Text>();
 
-            titleStyle = new GUIStyle(GUI.skin.label) { fontSize = 64, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter };
-            nameStyle = new GUIStyle(GUI.skin.label) { fontSize = 46, fontStyle = FontStyle.Bold, wordWrap = true };
-            bodyStyle = new GUIStyle(GUI.skin.label) { fontSize = 32, wordWrap = true };
-            tagStyle = new GUIStyle(GUI.skin.label) { fontSize = 26, fontStyle = FontStyle.Bold };
-            buttonStyle = new GUIStyle(GUI.skin.label) { fontSize = 36, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter };
-            foreach (GUIStyle style in new[] { titleStyle, nameStyle, bodyStyle, tagStyle, buttonStyle })
-                style.normal.textColor = Color.white;
-        }
-
-        private GUIStyle bodyCentered()
-        {
-            return new GUIStyle(bodyStyle) { alignment = TextAnchor.MiddleCenter };
+            root.gameObject.SetActive(false);
         }
     }
 

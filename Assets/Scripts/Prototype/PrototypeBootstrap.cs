@@ -42,11 +42,15 @@ namespace Com.MMsGamingCo.Ricomet
 #endif
 
             Application.targetFrameRate = PreferencesManager.GetTargetFrameRate();
+            GameFlow.Configure();
+            GameAudio.EnsureAudioManager();
+            IOSHaptics.Register();
 
             CreateChild<TimeController>("Time Controller");
             SetupCamera(settings);
             CreateChild<Arena>("Arena").Build(settings.arenaSize);
             CreateChild<EffectSpawner>("Effects");
+            CreateChild<ParticleBursts>("Particles");
             CreateChild<RunManager>("Run Manager").Setup(settings, runSeed);
             CreateChild<CometController>("Comet").Setup(settings);
 
@@ -56,8 +60,10 @@ namespace Com.MMsGamingCo.Ricomet
 
             CreateChild<EnemyFactory>("Enemies").Setup(settings);
             CreateChild<EnemyProjectiles>("Enemy Projectiles");
-            CreateChild<PrototypeHUD>("HUD");
+            CreateChild<GameHUD>("HUD");
             CreateChild<UpgradePickerUI>("Upgrade Picker");
+            CreateChild<PauseMenu>("Pause Menu");
+            CreateChild<GameAudioDirector>("Audio Director");
             CreateChild<TutorialManager>("Tutorial");
             BotDirector botDirector = CreateChild<BotDirector>("Playtest Bot");
 

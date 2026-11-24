@@ -51,7 +51,7 @@ namespace Com.MMsGamingCo.Ricomet
         {
             // Unscaled, so shake still plays during hit stop and slow motion.
             float time = Time.unscaledTime * frequency;
-            float shake = trauma * trauma * intensity;
+            float shake = trauma * trauma * intensity * GameSettings.ShakeIntensity;
 
             Vector3 offset = new Vector3(
                 (Mathf.PerlinNoise(seed, time) * 2f - 1f) * maxOffset * shake,

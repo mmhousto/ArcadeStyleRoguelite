@@ -84,11 +84,10 @@ namespace Com.MMsGamingCo.Ricomet
         private readonly List<Enemy> enemyBuffer = new List<Enemy>();
 
         // Visuals
-        private LineRenderer body;
-        private LineRenderer core;
+        private NeonShape body;
         private LineRenderer aimLine;
         private LineRenderer focusRing;
-        private readonly List<LineRenderer> chargePips = new List<LineRenderer>();
+        private readonly List<NeonShape> chargePips = new List<NeonShape>();
         private TrailRenderer trail;
 
         #endregion
@@ -471,8 +470,7 @@ namespace Com.MMsGamingCo.Ricomet
 
         private void BuildVisuals()
         {
-            body = ShapeFactory.CreatePolygon(transform, "Body", ShapeFactory.Circle(tuning.cometRadius, 20), NeonColors.Player, 0.1f, 10);
-            core = ShapeFactory.CreatePolygon(transform, "Core", ShapeFactory.Circle(tuning.cometRadius * 0.35f, 10), NeonColors.White, 0.08f, 11);
+            body = NeonShape.Create(transform, "comet", tuning.cometRadius, ShapeFactory.Circle(tuning.cometRadius, 20), NeonColors.Player, 10, 0.1f);
 
             aimLine = ShapeFactory.CreateLine(transform, "Aim", NeonColors.Player, 0.06f, 9);
             aimLine.useWorldSpace = true;
@@ -497,7 +495,7 @@ namespace Com.MMsGamingCo.Ricomet
         {
             int count = Mathf.CeilToInt(Energy != null ? Energy.Max : tuning.maxCharges);
             while (chargePips.Count < count)
-                chargePips.Add(ShapeFactory.CreatePolygon(transform, "Pip", ShapeFactory.Circle(0.09f, 8), NeonColors.Player, 0.06f, 10));
+                chargePips.Add(NeonShape.Create(transform, "pip", 0.13f, ShapeFactory.Circle(0.09f, 8), NeonColors.Player, 10, 0.06f));
             for (int i = 0; i < chargePips.Count; i++)
                 chargePips[i].gameObject.SetActive(i < count);
         }
@@ -517,13 +515,14 @@ namespace Com.MMsGamingCo.Ricomet
 
                 float fill = Mathf.Clamp01(Energy.Current - i);
                 Color pipColor = fill >= 1f ? NeonColors.Player : NeonColors.WithAlpha(NeonColors.Disabled, 0.25f + 0.5f * fill);
-                ShapeFactory.SetColor(chargePips[i], pipColor);
+                chargePips[i].SetColor(pipColor);
             }
 
             // Blink while invulnerable after a hit.
-            bool visible = !Health.IsInvulnerable || Mathf.Repeat(Time.unscaledTime * 12f, 1f) > 0.5f;
-            body.enabled = visible && !Health.IsDead;
-            core.enabled = visible && !Health.IsDead;
+            // Reduce Flashing: dim instead of blink.
+            bool blinkOff = Health.IsInvulnerable && !GameSettings.ReduceFlashing && Mathf.Repeat(Time.unscaledTime * 12f, 1f) <= 0.5f;
+            body.SetVisible(!blinkOff && !Health.IsDead);
+            body.SetColor(Health.IsInvulnerable && GameSettings.ReduceFlashing ? NeonColors.WithAlpha(NeonColors.Player, 0.5f) : NeonColors.Player);
         }
 
         private void SetAimVisuals(bool show)

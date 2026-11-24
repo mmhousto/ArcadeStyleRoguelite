@@ -12,7 +12,7 @@ namespace Com.MMsGamingCo.Ricomet
         private const float Lifetime = 0.4f;
         private const float Radius = 0.2f;
 
-        private LineRenderer line;
+        private NeonShape line;
         private Vector2 velocity;
         private float timer;
 
@@ -20,8 +20,7 @@ namespace Com.MMsGamingCo.Ricomet
 
         private void Awake()
         {
-            line = ShapeFactory.CreateLine(transform, "Shard", NeonColors.Player, 0.08f, 7);
-            ShapeFactory.SetPoints(line, new[] { new Vector2(-0.25f, 0f), new Vector2(0.25f, 0f) });
+            line = NeonShape.Create(transform, "shard", 0.3f, new[] { new Vector2(-0.25f, 0f), new Vector2(0.25f, 0f) }, NeonColors.Player, 7, 0.08f);
         }
 
         public void Launch(Vector2 position, Vector2 direction)

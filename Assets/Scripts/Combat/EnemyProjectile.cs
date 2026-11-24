@@ -11,7 +11,7 @@ namespace Com.MMsGamingCo.Ricomet
     {
         private const float Radius = 0.28f;
 
-        private LineRenderer outline;
+        private NeonShape outline;
         private Vector2 velocity;
         private float lifetime;
 
@@ -22,7 +22,7 @@ namespace Com.MMsGamingCo.Ricomet
 
         private void Awake()
         {
-            outline = ShapeFactory.CreatePolygon(transform, "Orb", ShapeFactory.Circle(Radius, 10), NeonColors.Danger, 0.1f, 6);
+            outline = NeonShape.Create(transform, "orb", Radius * 1.1f, ShapeFactory.Circle(Radius, 10), NeonColors.Danger, 6);
         }
 
         public void Launch(Vector2 position, Vector2 newVelocity, float seconds)

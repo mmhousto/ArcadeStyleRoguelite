@@ -1,6 +1,6 @@
 {
   "name": "com.mmsgamingco.core",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "displayName": "MMs Gaming Co Core",
   "description": "Reusable boilerplate for Unity projects: singletons, audio, preferences, scene loading, local and cloud saves, safe area UI and object pooling.",
   "unity": "6000.0",
