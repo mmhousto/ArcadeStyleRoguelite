@@ -67,14 +67,34 @@ public class BossTests
     }
 
     [Test]
-    public void DashFromInsideBouncesBackIn()
+    public void DashFromInsideAlwaysGetsOut()
     {
+        // One-way shield: it never traps the comet inside with the boss.
         var shield = new RotatingShield(3f, RotatingShield.Pattern("XXXX"));
-        bool hit = shield.TryDeflect(Vector2.zero, Vector2.zero, new Vector2(10f, 0f), 0.5f, out Vector2 point, out Vector2 normal);
+        Assert.IsFalse(shield.TryDeflect(Vector2.zero, Vector2.zero, new Vector2(10f, 0f), 0.5f, out _, out _));
+        Assert.IsFalse(shield.TryDeflect(Vector2.zero, new Vector2(2.9f, 0f), new Vector2(10f, 0f), 0.5f, out _, out _));
+    }
+
+    [Test]
+    public void DashIntoCoreRicochetsOff()
+    {
+        bool hit = Geometry2D.BounceOffCircle(Vector2.zero, 1.3f, new Vector2(-10f, 0f), new Vector2(0f, 0f), 0.45f, out Vector2 point, out Vector2 normal);
 
         Assert.IsTrue(hit);
-        Assert.Less(point.x, 3f);
+        Assert.Less(point.x, -1.75f, "Stops outside the core, never inside it.");
         Assert.Less(normal.x, -0.99f);
+    }
+
+    [Test]
+    public void GlancingDashMissesCore()
+    {
+        Assert.IsFalse(Geometry2D.BounceOffCircle(Vector2.zero, 1.3f, new Vector2(-10f, 3f), new Vector2(10f, 3f), 0.45f, out _, out _));
+    }
+
+    [Test]
+    public void CometOverlappingCoreCanLeave()
+    {
+        Assert.IsFalse(Geometry2D.BounceOffCircle(Vector2.zero, 1.3f, new Vector2(0.5f, 0f), new Vector2(10f, 0f), 0.45f, out _, out _));
     }
 
     [Test]

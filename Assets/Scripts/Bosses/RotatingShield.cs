@@ -50,17 +50,17 @@ namespace Com.MMsGamingCo.Ricomet
 
         /// <summary>
         /// Checks a comet of cometRadius moving from start to end against the ring around center.
-        /// The comet bounces back to the side it came from.
+        /// The ring is one-way: it bounces dashes coming in from outside, but anything
+        /// inside can always dash out, so the player can never be trapped with the boss.
         /// </summary>
         public bool TryDeflect(Vector2 center, Vector2 start, Vector2 end, float cometRadius, out Vector2 hitPoint, out Vector2 normal)
         {
             hitPoint = end;
             normal = Vector2.zero;
 
-            bool startedOutside = (start - center).sqrMagnitude > Radius * Radius;
-
-            // Grow or shrink the ring by the comet's size, so its edge (not center) touches.
-            float contactRadius = startedOutside ? Radius + cometRadius : Mathf.Max(0.01f, Radius - cometRadius);
+            // Grow the ring by the comet's size, so its edge (not center) touches.
+            float contactRadius = Radius + cometRadius;
+            if ((start - center).sqrMagnitude < contactRadius * contactRadius) return false;
             if (!Geometry2D.SegmentCrossesCircle(start, end, center, contactRadius, out float t)) return false;
 
             Vector2 contact = start + (end - start) * t;
@@ -68,7 +68,7 @@ namespace Com.MMsGamingCo.Ricomet
             float angle = Mathf.Atan2(radial.y, radial.x) * Mathf.Rad2Deg;
             if (!IsSolidAt(angle)) return false;
 
-            normal = startedOutside ? radial.normalized : -radial.normalized;
+            normal = radial.normalized;
             // Nudge off the surface so the next step doesn't hit it again.
             hitPoint = contact + normal * 0.02f;
             return true;

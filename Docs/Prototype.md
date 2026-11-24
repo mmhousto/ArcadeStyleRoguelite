@@ -40,9 +40,10 @@ Taking a hit pushes enemies further away. Tune both under **Knockback** in `Prot
 
 ## The Prism (boss)
 
-- **Core** (two spinning triangles): dash through it to damage it. Don't stop on it.
-- **Shield ring**: solid segments deflect your dash for free (no wall bounce used). Slip through
-  a gap, or bank a shot off the ring. The aim line shows deflections.
+- **Core** (two spinning triangles): a bumper. Dash into it to damage it and you ricochet off.
+- **Shield ring**: one-way. Solid segments deflect dashes coming in (free, no wall bounce used),
+  but you can always dash out. Slip through a gap, or bank a shot off the ring. The aim line
+  shows deflections and the core ricochet.
 - **Beams**: a thin flickering line warns where a beam will appear, then it sweeps. Beams and
   orbs only hurt you when you're stopped, like everything else.
 - **Phases** at 66% and 33% (ticks on the health bar): more gaps but a faster shield that

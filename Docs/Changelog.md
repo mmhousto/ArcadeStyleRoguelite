@@ -4,6 +4,16 @@ Versions are 0.x during development; 1.0 is launch. Each version has its own `v<
 
 ## 0.4: Playtest bot and tutorial
 
+**Fixes after playtesting** (players and the bot all died inside the Prism):
+- The Prism's shield is now one-way: it bounces dashes coming in, but you can always dash out.
+  Before, the inside of the ring bounced you back in and trapped you with the core and beams.
+- The Prism's core is a bumper: a dash that hits it deals damage and ricochets off, so you can
+  never end a dash inside the core. Before, dashes passed through and could stop inside it,
+  taking a hit every second because knockback doesn't move bosses.
+- Safety net: a stopped comet overlapping the core is pushed out.
+- The aim line and the bot both show and use the core ricochet. Boss tutorial hints explain it.
+
+
 - **Playtest bot** (`BotPilot`, `BotDirector`): simulates 216 possible dashes (72 directions
   x 3 powers, with wall bounces and shield ricochets) and picks the best by kills and boss hits
   minus landing danger (enemies, Dart charge lines, beams, orbs, boss core, inside the shield).

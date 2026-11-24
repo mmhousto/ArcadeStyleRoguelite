@@ -254,7 +254,7 @@ namespace Com.MMsGamingCo.Ricomet
             float step = Mathf.Min(Stats.dashSpeed * deltaTime, dashDistanceLeft);
             Vector2 start = Position;
 
-            bool hitSomething = DashObstacles.Cast(start, dashDirection * step, Arena.Bounds, tuning.cometRadius, out Vector2 end, out Vector2 wallNormal, out bool hitObstacle);
+            DashCastResult hit = DashObstacles.Cast(start, dashDirection * step, Arena.Bounds, tuning.cometRadius, out Vector2 end, out Vector2 wallNormal);
             float moved = (end - start).magnitude;
 
             transform.position = end;
@@ -266,15 +266,25 @@ namespace Com.MMsGamingCo.Ricomet
 
             if (State != CometState.Dashing) return;
 
-            if (hitObstacle)
+            if (hit.HitObstacle)
             {
-                // Obstacles (boss shields) always deflect and don't use up wall bounces.
+                // Obstacles (boss shields and cores) always deflect and don't use up wall bounces.
                 dashDirection = Vector2.Reflect(dashDirection, wallNormal);
                 EffectSpawner.Landing(end, 0.9f);
                 ScreenShake.Add(0.12f);
-                obstacleDeflected?.Invoke();
+
+                if (hit.isDashHit && hit.obstacle is Enemy target && target.IsAlive && !hitThisDash.Contains(target))
+                {
+                    hitThisDash.Add(target);
+                    target.Damage(Stats.dashDamage, DamageSource.Dash);
+                    ScreenShake.Add(0.2f);
+                }
+                else if (!hit.isDashHit)
+                {
+                    obstacleDeflected?.Invoke();
+                }
             }
-            else if (hitSomething)
+            else if (hit.hitWall)
             {
                 if (bouncesLeft > 0)
                 {
@@ -390,6 +400,14 @@ namespace Com.MMsGamingCo.Ricomet
         {
             if (IsDashing || graceTimer > 0f || Health.IsDead) return false;
             return Health.TakeHit();
+        }
+
+        /// <summary>Moves a stopped comet, e.g. pushed out of a boss core. Ignored while dashing.</summary>
+        public void PushTo(Vector2 position)
+        {
+            if (IsDashing) return;
+            transform.position = Arena.Clamp(position, tuning.cometRadius);
+            EffectSpawner.Landing(Position, 1.2f);
         }
 
         /// <summary>Knocks back and stuns every enemy within radius of the comet.</summary>
@@ -509,14 +527,14 @@ namespace Com.MMsGamingCo.Ricomet
 
             while (distanceLeft > 0.01f)
             {
-                bool hit = DashObstacles.Cast(position, direction * distanceLeft, Arena.Bounds, tuning.cometRadius, out Vector2 end, out Vector2 normal, out bool hitObstacle);
+                DashCastResult hit = DashObstacles.Cast(position, direction * distanceLeft, Arena.Bounds, tuning.cometRadius, out Vector2 end, out Vector2 normal);
                 float moved = (end - position).magnitude;
                 distanceLeft -= moved;
                 position = end;
                 points.Add(position);
 
-                if (!hit) break;
-                if (!hitObstacle)
+                if (!hit.HitAnything) break;
+                if (!hit.HitObstacle)
                 {
                     if (bounces <= 0) break;
                     bounces--;

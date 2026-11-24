@@ -35,6 +35,8 @@ namespace Com.MMsGamingCo.Ricomet
         private float thinkTimer = 0f;
         private readonly List<Vector2> path = new List<Vector2>();
         private readonly HashSet<Enemy> pathKills = new HashSet<Enemy>();
+        // Set by SimulatePath when the dash would ricochet off a boss core (a hit).
+        private bool pathHitsBossCore = false;
 
         private struct Plan
         {
@@ -158,6 +160,10 @@ namespace Com.MMsGamingCo.Ricomet
                 if (dies) pathKills.Add(enemy);
             }
 
+            // Core ricochets stop just outside the core, so PathHits can miss them.
+            if (pathHitsBossCore && PrismBoss.Current != null && !PrismBoss.Current.IsInvulnerable)
+                plan.bossHit = true;
+
             Vector2 landing = path[path.Count - 1];
             plan.landingDanger = Danger(landing, comet.Radius, pathKills);
 
@@ -183,20 +189,22 @@ namespace Com.MMsGamingCo.Ricomet
         {
             path.Clear();
             path.Add(start);
+            pathHitsBossCore = false;
 
             Vector2 position = start;
             float distanceLeft = distance;
 
             while (distanceLeft > 0.01f && path.Count < 8)
             {
-                bool hit = DashObstacles.Cast(position, direction * distanceLeft, Arena.Bounds, radius, out Vector2 end, out Vector2 normal, out bool isObstacle);
+                DashCastResult hit = DashObstacles.Cast(position, direction * distanceLeft, Arena.Bounds, radius, out Vector2 end, out Vector2 normal);
                 float moved = (end - position).magnitude;
                 distanceLeft -= moved;
                 position = end;
                 path.Add(position);
 
-                if (!hit || moved < 0.001f) break;
-                if (!isObstacle)
+                if (hit.isDashHit) pathHitsBossCore = true;
+                if (!hit.HitAnything || moved < 0.001f) break;
+                if (!hit.HitObstacle)
                 {
                     if (bounces <= 0) break;
                     bounces--;
@@ -272,8 +280,8 @@ namespace Com.MMsGamingCo.Ricomet
 
             if (distance < boss.coreRadius + radius + 0.7f) danger += 5f;
 
-            // Inside the ring you can only get out through a gap.
-            if (distance < boss.shieldRadius) danger += boss.BeamsDangerous ? 2.5f : 1f;
+            // Inside the ring is close to the beams' origin, where they sweep fastest past you.
+            if (distance < boss.shieldRadius) danger += boss.BeamsDangerous ? 1.5f : 0.3f;
 
             if (boss.BeamsDangerous)
             {

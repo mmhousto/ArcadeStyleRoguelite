@@ -125,13 +125,38 @@ namespace Com.MMsGamingCo.Ricomet
             bossAppeared?.Invoke(this);
         }
 
-        public bool TryDeflect(Vector2 start, Vector2 end, float cometRadius, out Vector2 hitPoint, out Vector2 normal)
+        public bool TryDeflect(Vector2 start, Vector2 end, float cometRadius, out Vector2 hitPoint, out Vector2 normal, out bool isDashHit)
         {
             hitPoint = end;
             normal = Vector2.zero;
-            // No deflection while it's still appearing (the ring is drawn smaller then).
-            if (!IsAlive || introTimer > 0f) return false;
-            return shield.TryDeflect(Position, start, end, cometRadius, out hitPoint, out normal);
+            isDashHit = false;
+            if (!IsAlive) return false;
+
+            // The core is a bumper: dashes ricochet off it, so the comet never ends up inside.
+            bool hitCore = Geometry2D.BounceOffCircle(Position, coreRadius, start, end, cometRadius, out Vector2 corePoint, out Vector2 coreNormal);
+
+            // No shield while it's still appearing (the ring is drawn smaller then).
+            bool hitShield = false;
+            Vector2 shieldPoint = end, shieldNormal = Vector2.zero;
+            if (introTimer <= 0f)
+                hitShield = shield.TryDeflect(Position, start, end, cometRadius, out shieldPoint, out shieldNormal);
+
+            if (hitShield && (!hitCore || (shieldPoint - start).sqrMagnitude < (corePoint - start).sqrMagnitude))
+            {
+                hitPoint = shieldPoint;
+                normal = shieldNormal;
+                return true;
+            }
+
+            if (hitCore)
+            {
+                hitPoint = corePoint;
+                normal = coreNormal;
+                isDashHit = true;
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>Bosses don't get pushed around.</summary>
@@ -179,6 +204,7 @@ namespace Com.MMsGamingCo.Ricomet
         protected override void Tick(float deltaTime)
         {
             if (hitCooldownTimer > 0f) hitCooldownTimer -= deltaTime;
+            PushCometOutOfCore();
 
             if (introTimer > 0f)
             {
@@ -229,6 +255,23 @@ namespace Com.MMsGamingCo.Ricomet
 
 
         #region Private Methods
+
+        /// <summary>
+        /// Safety net: a stopped comet should never sit inside the core (the bumper bounce
+        /// prevents it), but if it does, push it out instead of hitting it every second.
+        /// </summary>
+        private void PushCometOutOfCore()
+        {
+            CometController comet = CometController.Instance;
+            if (comet == null || comet.IsDashing || comet.Health.IsDead) return;
+
+            Vector2 away = comet.Position - Position;
+            float contact = coreRadius + comet.Radius;
+            if (away.sqrMagnitude >= contact * contact) return;
+
+            Vector2 direction = away.sqrMagnitude > 0.0001f ? away.normalized : Vector2.left;
+            comet.PushTo(Position + direction * (contact + 0.6f));
+        }
 
         private void CheckPhase()
         {

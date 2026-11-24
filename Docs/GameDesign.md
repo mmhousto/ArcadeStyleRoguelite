@@ -218,7 +218,7 @@ modifier (fast, shielded, explosive). Elites drop extra Sparks.
 
 | Sector | Boss | Idea |
 |---|---|---|
-| 1 | **Prism** | A rotating crystal core inside a spinning shield ring. Dashes ricochet off the solid segments, so you slip through gaps or bank shots off the ring to hit the core. Sweeping laser beams (telegraphed), orb rings and minions; 3 phases. |
+| 1 | **Prism** | A rotating crystal core inside a spinning, one-way shield ring. Dashes coming in ricochet off the solid segments (you can always dash out), so you slip through gaps or bank shots off the ring. The core is a bumper: hitting it deals damage and ricochets you off. Sweeping laser beams (telegraphed), orb rings and minions; 3 phases. |
 | 2 | **Serpent** | A long chain of segments. Each segment is a hit; the head is armored. Breaking the middle splits it in two. |
 | 3 | **The Core** | Fills the arena center, spawns waves, changes phase at 66% and 33% health; the arena shrinks. |
 

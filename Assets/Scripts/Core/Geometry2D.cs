@@ -62,6 +62,26 @@ namespace Com.MMsGamingCo.Ricomet
             return false;
         }
 
+        /// <summary>
+        /// Bounces a comet of cometRadius moving from start to end off the outside of a
+        /// solid circle, like a pinball bumper. Something already overlapping isn't
+        /// bounced, so it can always move away.
+        /// </summary>
+        public static bool BounceOffCircle(Vector2 center, float radius, Vector2 start, Vector2 end, float cometRadius, out Vector2 hitPoint, out Vector2 normal)
+        {
+            hitPoint = end;
+            normal = Vector2.zero;
+
+            float contact = radius + cometRadius;
+            if ((start - center).sqrMagnitude < contact * contact) return false;
+            if (!SegmentCrossesCircle(start, end, center, contact, out float t)) return false;
+
+            Vector2 point = start + (end - start) * t;
+            normal = (point - center).normalized;
+            hitPoint = point + normal * 0.02f;
+            return true;
+        }
+
         public static bool CirclesOverlap(Vector2 a, float radiusA, Vector2 b, float radiusB)
         {
             float reach = radiusA + radiusB;

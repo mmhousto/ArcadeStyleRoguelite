@@ -26,16 +26,16 @@ namespace Com.MMsGamingCo.Ricomet
         /// <summary>
         /// Moves from start toward end and stops at the first obstacle or wall.
         /// </summary>
-        /// <returns>True if anything was hit. isObstacle tells which.</returns>
-        public static bool Cast(Vector2 start, Vector2 delta, Rect bounds, float radius, out Vector2 end, out Vector2 normal, out bool isObstacle)
+        /// <returns>What was hit, if anything.</returns>
+        public static DashCastResult Cast(Vector2 start, Vector2 delta, Rect bounds, float radius, out Vector2 end, out Vector2 normal)
         {
-            bool hitWall = Geometry2D.MoveInsideBounds(start, delta, bounds, radius, out end, out normal);
-            isObstacle = false;
+            DashCastResult result = new DashCastResult();
+            result.hitWall = Geometry2D.MoveInsideBounds(start, delta, bounds, radius, out end, out normal);
 
             float bestDistance = (end - start).sqrMagnitude;
             foreach (IDashObstacle obstacle in active)
             {
-                if (!obstacle.TryDeflect(start, end, radius, out Vector2 hitPoint, out Vector2 hitNormal)) continue;
+                if (!obstacle.TryDeflect(start, end, radius, out Vector2 hitPoint, out Vector2 hitNormal, out bool isDashHit)) continue;
 
                 float distance = (hitPoint - start).sqrMagnitude;
                 if (distance <= bestDistance)
@@ -43,11 +43,14 @@ namespace Com.MMsGamingCo.Ricomet
                     bestDistance = distance;
                     end = hitPoint;
                     normal = hitNormal;
-                    isObstacle = true;
+                    result.obstacle = obstacle;
+                    result.isDashHit = isDashHit;
+                    // An obstacle closer than the wall means the wall wasn't reached.
+                    result.hitWall = false;
                 }
             }
 
-            return hitWall || isObstacle;
+            return result;
         }
     }
 

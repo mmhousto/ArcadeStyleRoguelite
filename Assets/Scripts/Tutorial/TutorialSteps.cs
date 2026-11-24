@@ -64,11 +64,11 @@ namespace Com.MMsGamingCo.Ricomet
                     c => c.upgradesTaken >= 1) { duringPicker = true, minShowSeconds = 0.5f },
 
                 // Boss.
-                new TutorialStep("tut_boss", "Boss! Dash through the gaps in the shield ring to hit the core.", Context,
+                new TutorialStep("tut_boss", "Boss! Dash through a gap in the shield ring and into the core. You'll ricochet off it.", Context,
                     (c, isDone) => c.bossActive,
                     c => c.bossDashHits >= 1) { minShowSeconds = 2.5f },
 
-                new TutorialStep("tut_shield", "Solid parts of the ring bounce your dash. Bank shots off it!", Context,
+                new TutorialStep("tut_shield", "The ring bounces dashes coming in, but you can always dash out. Bank shots off it!", Context,
                     (c, isDone) => c.bossActive && isDone("tut_boss"),
                     c => c.shieldDeflects >= 1) { minShowSeconds = 2.5f, autoCompleteSeconds = 8f },
 
