@@ -16,8 +16,8 @@ namespace Com.MMsGamingCo.Ricomet
         [Tooltip("0 = random seed each run. Set a number to replay the same spawns.")]
         public int seed = 0;
 
-        [Tooltip("Extra world units shown around the arena.")]
-        public float cameraMargin = 1f;
+        [Tooltip("Extra world units shown around the arena (inside the HUD bands).")]
+        public float cameraMargin = 0.4f;
 
         [Tooltip("Let the playtest bot play. Press P during play to toggle.")]
         public bool botPlays = false;
@@ -90,16 +90,18 @@ namespace Com.MMsGamingCo.Ricomet
                 cam.tag = "MainCamera";
             }
 
+            // Leave bands above and below the arena for the HUD.
+            Rect safe = Screen.safeArea;
+            float topInset = Screen.height > 0 ? (Screen.height - safe.yMax) / Screen.height : 0f;
+            float bottomInset = Screen.height > 0 ? safe.y / Screen.height : 0f;
+            HudLayout.FitArena(settings.arenaSize, cameraMargin, cam.aspect, topInset, bottomInset, out float orthographicSize, out float cameraY);
+
             cam.orthographic = true;
-            cam.transform.position = new Vector3(0f, 0f, -10f);
+            cam.orthographicSize = orthographicSize;
+            cam.transform.position = new Vector3(0f, cameraY, -10f);
             cam.transform.rotation = Quaternion.identity;
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = NeonColors.Background;
-
-            // Fit the whole arena on screen whatever the aspect ratio.
-            float halfHeight = settings.arenaSize.y * 0.5f + cameraMargin;
-            float halfWidth = settings.arenaSize.x * 0.5f + cameraMargin;
-            cam.orthographicSize = Mathf.Max(halfHeight, halfWidth / Mathf.Max(0.1f, cam.aspect));
 
             // Added after positioning: ScreenShake shakes around the position it starts at.
             if (cam.GetComponent<ScreenShake>() == null)

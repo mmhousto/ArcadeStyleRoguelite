@@ -1,4 +1,5 @@
 using Com.MMsGamingCo.Core;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -57,11 +58,10 @@ namespace Com.MMsGamingCo.Ricomet
             menuRoot = UIFactory.CreateRect("Menu", safe);
             UIFactory.Stretch(menuRoot);
 
-            Text title = UIFactory.CreateText(menuRoot, "RICOMET", 190, UITheme.Cyan, TextAnchor.MiddleCenter);
+            TextMeshProUGUI title = UIFactory.CreateText(menuRoot, "RICOMET", 190, UITheme.Cyan, TextAnchor.MiddleCenter);
             UIFactory.Place(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -90f), new Vector2(1600f, 230f));
-            title.GetComponent<Outline>().effectDistance = new Vector2(5f, -5f);
 
-            Text tagline = UIFactory.CreateText(menuRoot, "RICOCHET  /  COMET  /  NEON", 34, UITheme.Magenta, TextAnchor.MiddleCenter, false);
+            TextMeshProUGUI tagline = UIFactory.CreateText(menuRoot, "RICOCHET  /  COMET  /  NEON", 34, UITheme.Magenta, TextAnchor.MiddleCenter, false);
             UIFactory.Place(tagline.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -310f), new Vector2(1600f, 50f));
 
             RectTransform buttons = UIFactory.CreateRect("Buttons", menuRoot);
@@ -85,12 +85,12 @@ namespace Com.MMsGamingCo.Ricomet
             string best = save.bestScore > 0
                 ? "BEST " + save.bestScore.ToString("N0") + "    BEST COMBO " + save.bestCombo + (save.bossesDefeated > 0 ? "    PRISM DEFEATED x" + save.bossesDefeated : "")
                 : "DRAG BACK, LET GO, RICOCHET";
-            Text bestText = UIFactory.CreateText(menuRoot, best, 32, UITheme.Yellow, TextAnchor.MiddleCenter, false);
+            TextMeshProUGUI bestText = UIFactory.CreateText(menuRoot, best, 32, UITheme.Yellow, TextAnchor.MiddleCenter, false);
             UIFactory.Place(bestText.rectTransform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 120f), new Vector2(1600f, 50f));
 
-            Text company = UIFactory.CreateText(menuRoot, "MM'S GAMING CO", 26, UITheme.Dim, TextAnchor.LowerLeft, false, false);
+            TextMeshProUGUI company = UIFactory.CreateText(menuRoot, "MM'S GAMING CO", 26, UITheme.Dim, TextAnchor.LowerLeft, false, false);
             UIFactory.Place(company.rectTransform, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(40f, 30f), new Vector2(600f, 40f));
-            Text version = UIFactory.CreateText(menuRoot, "V" + Application.version, 26, UITheme.Dim, TextAnchor.LowerRight, false, false);
+            TextMeshProUGUI version = UIFactory.CreateText(menuRoot, "V" + Application.version, 26, UITheme.Dim, TextAnchor.LowerRight, false, false);
             UIFactory.Place(version.rectTransform, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-40f, 30f), new Vector2(400f, 40f));
 
             BuildCredits(canvas.transform);
@@ -106,10 +106,10 @@ namespace Com.MMsGamingCo.Ricomet
             Image panel = UIFactory.CreatePanel(creditsRoot, UITheme.Magenta, UITheme.PanelFill, true);
             UIFactory.Place(panel.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(1100f, 760f));
 
-            Text title = UIFactory.CreateText(panel.transform, "CREDITS", 64, UITheme.Magenta, TextAnchor.MiddleCenter);
+            TextMeshProUGUI title = UIFactory.CreateText(panel.transform, "CREDITS", 64, UITheme.Magenta, TextAnchor.MiddleCenter);
             UIFactory.Place(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -40f), new Vector2(1000f, 90f));
 
-            Text body = UIFactory.CreateText(panel.transform,
+            TextMeshProUGUI body = UIFactory.CreateText(panel.transform,
                 "A game by MM's Gaming Co\n\n" +
                 "Made with Unity\n\n" +
                 "Orbitron font by The Orbitron Project Authors\nSIL Open Font License 1.1\n\n" +

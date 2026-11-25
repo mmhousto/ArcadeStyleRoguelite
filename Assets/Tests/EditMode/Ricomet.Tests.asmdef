@@ -5,7 +5,8 @@
         "Ricomet",
         "MMsGamingCo.Core",
         "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
+        "UnityEditor.TestRunner",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [
         "Editor"

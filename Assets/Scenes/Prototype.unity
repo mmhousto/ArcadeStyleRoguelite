@@ -469,7 +469,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tuning: {fileID: 0}
   seed: 0
-  cameraMargin: 1
+  cameraMargin: 0.4
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

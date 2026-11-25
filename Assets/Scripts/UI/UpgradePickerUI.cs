@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,16 +20,16 @@ namespace Com.MMsGamingCo.Ricomet
             public Button button;
             public Image frame;
             public Image icon;
-            public Text rarity, title, level, description;
+            public TextMeshProUGUI rarity, title, level, description;
         }
 
         public bool IsOpen { get; private set; }
 
         private RectTransform root;
-        private Text titleText;
+        private TextMeshProUGUI titleText;
         private readonly Card[] cards = new Card[CardCount];
         private Button rerollButton;
-        private Text rerollText;
+        private TextMeshProUGUI rerollText;
         private List<UpgradeDefinition> offer = new List<UpgradeDefinition>();
         private float openTimer;
 
@@ -132,7 +133,7 @@ namespace Com.MMsGamingCo.Ricomet
 
             titleText = UIFactory.CreateText(root, "CHOOSE AN UPGRADE", 76, UITheme.White, TextAnchor.MiddleCenter);
             UIFactory.Place(titleText.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -70f), new Vector2(1600f, 100f));
-            Text subtitle = UIFactory.CreateText(root, "Choose one", 36, UITheme.Dim, TextAnchor.MiddleCenter, false, false);
+            TextMeshProUGUI subtitle = UIFactory.CreateText(root, "Choose one", 36, UITheme.Dim, TextAnchor.MiddleCenter, false, false);
             UIFactory.Place(subtitle.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -160f), new Vector2(1600f, 50f));
 
             const float cardWidth = 420f, cardHeight = 600f, gap = 50f;
@@ -161,7 +162,7 @@ namespace Com.MMsGamingCo.Ricomet
 
             rerollButton = UIFactory.CreateButton(root, "REROLL", UITheme.Yellow, Reroll, 36);
             UIFactory.Place((RectTransform)rerollButton.transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 60f), new Vector2(380f, 100f));
-            rerollText = rerollButton.GetComponentInChildren<Text>();
+            rerollText = rerollButton.GetComponentInChildren<TextMeshProUGUI>();
 
             root.gameObject.SetActive(false);
         }

@@ -37,7 +37,7 @@ public class AssetTests
     [Test]
     public void UiFontExists()
     {
-        Assert.IsNotNull(Resources.Load<Font>(UITheme.BoldFontPath));
-        Assert.IsNotNull(Resources.Load<Font>(UITheme.MediumFontPath));
+        Assert.IsNotNull(Resources.Load<TMPro.TMP_FontAsset>(UITheme.BoldFontPath));
+        Assert.IsNotNull(Resources.Load<TMPro.TMP_FontAsset>(UITheme.MediumFontPath));
     }
 }

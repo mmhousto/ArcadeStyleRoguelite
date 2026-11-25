@@ -1,4 +1,5 @@
 using Com.MMsGamingCo.Core;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -47,14 +48,15 @@ namespace Com.MMsGamingCo.Ricomet
         private void Build(RectTransform root)
         {
             Image frame = UIFactory.CreatePanel(root, UITheme.Cyan, UITheme.PanelFill, true);
-            UIFactory.Place(frame.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(1000f, 900f));
+            UIFactory.Place(frame.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(1000f, 860f));
 
-            Text title = UIFactory.CreateText(frame.transform, "SETTINGS", 64, UITheme.Cyan, TextAnchor.MiddleCenter);
-            UIFactory.Place(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -30f), new Vector2(900f, 90f));
+            TextMeshProUGUI title = UIFactory.CreateText(frame.transform, "SETTINGS", 64, UITheme.Cyan, TextAnchor.MiddleCenter);
+            UIFactory.Place(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -28f), new Vector2(900f, 84f));
 
             RectTransform list = UIFactory.CreateRect("Controls", frame.transform);
-            UIFactory.Place(list, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -140f), new Vector2(820f, 620f));
-            UIFactory.AddVerticalLayout(list, 10f);
+            // 6 rows x 76 + 5 x 12 spacing = 516, ending well above the bottom buttons.
+            UIFactory.Place(list, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -130f), new Vector2(820f, 520f));
+            UIFactory.AddVerticalLayout(list, 12f);
 
             // The Core AudioPlayerSettings wires sliders to the AudioManager and saves them.
             Slider master = UIFactory.CreateSlider(list, "Master", PreferencesManager.GetMasterVolume(), null);
@@ -75,11 +77,11 @@ namespace Com.MMsGamingCo.Ricomet
             UIFactory.CreateToggle(list, "Reduce screen shake", GameSettings.ReduceShake, on => GameSettings.ReduceShake = on);
             UIFactory.CreateToggle(list, "Reduce flashing", GameSettings.ReduceFlashing, on => GameSettings.ReduceFlashing = on);
 
-            Button tutorial = UIFactory.CreateButton(list, "Replay tutorial", UITheme.Yellow, ReplayTutorial, 32);
-            UIFactory.SetLayoutHeight(tutorial, 80f);
-
-            Button back = UIFactory.CreateButton(frame.transform, "Back", UITheme.White, Back, 40);
-            UIFactory.Place((RectTransform)back.transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 30f), new Vector2(360f, 100f));
+            // Bottom row, side by side.
+            Button tutorial = UIFactory.CreateButton(frame.transform, "Replay tutorial", UITheme.Yellow, ReplayTutorial, 30);
+            UIFactory.Place((RectTransform)tutorial.transform, new Vector2(0.5f, 0f), new Vector2(1f, 0f), new Vector2(-15f, 40f), new Vector2(400f, 96f));
+            Button back = UIFactory.CreateButton(frame.transform, "Back", UITheme.White, Back, 38);
+            UIFactory.Place((RectTransform)back.transform, new Vector2(0.5f, 0f), new Vector2(0f, 0f), new Vector2(15f, 40f), new Vector2(400f, 96f));
         }
 
         private void ReplayTutorial()

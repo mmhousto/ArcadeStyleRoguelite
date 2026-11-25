@@ -20,9 +20,11 @@ Unity 6 (6000.3) URP project, iOS first, landscape, Steam port later. Arcade-sty
 ## Runtime-built scenes
 
 Scenes hold one bootstrap object (`MainMenuBootstrap`, `PrototypeBootstrap`); everything
-else, including uGUI, is built from code. Build UI with `UIFactory` and `UITheme`, load art
-with `SpriteLibrary` / `NeonShape`, play sounds with `GameAudio`. Decorative UI graphics must
-not be raycast targets, so touches pass through to aiming.
+else, including uGUI, is built from code. Build UI with `UIFactory` and `UITheme` (text is
+TextMeshPro with the Orbitron SDF assets in `Resources/Fonts`), load art with `SpriteLibrary` /
+`NeonShape`, play sounds with `GameAudio`. Decorative UI graphics must not be raycast targets,
+so touches pass through to aiming. In-run HUD elements stay inside the `HudLayout` bands; the
+camera keeps the arena between them.
 
 ## Versions and branches
 

@@ -1,4 +1,5 @@
 using Com.MMsGamingCo.Core;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,6 +20,7 @@ namespace Com.MMsGamingCo.Ricomet
         public bool IsOpen { get; private set; }
 
         private RectTransform root;
+        private RectTransform pausePanel;
         private Button resumeButton;
         private SettingsPanel settings;
 
@@ -71,6 +73,7 @@ namespace Com.MMsGamingCo.Ricomet
 
             IsOpen = false;
             settings.Hide();
+            pausePanel.gameObject.SetActive(true);
             root.gameObject.SetActive(false);
             SetGamePaused(false);
         }
@@ -101,9 +104,10 @@ namespace Com.MMsGamingCo.Ricomet
             UIFactory.CreateBackdrop(root);
 
             Image panel = UIFactory.CreatePanel(root, UITheme.Cyan, UITheme.PanelFill, true);
+            pausePanel = panel.rectTransform;
             UIFactory.Place(panel.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(640f, 760f));
 
-            Text title = UIFactory.CreateText(panel.transform, "PAUSED", 72, UITheme.Cyan, TextAnchor.MiddleCenter);
+            TextMeshProUGUI title = UIFactory.CreateText(panel.transform, "PAUSED", 72, UITheme.Cyan, TextAnchor.MiddleCenter);
             UIFactory.Place(title.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -40f), new Vector2(600f, 100f));
 
             RectTransform buttons = UIFactory.CreateRect("Buttons", panel.transform);
@@ -117,12 +121,18 @@ namespace Com.MMsGamingCo.Ricomet
             foreach (Button button in new[] { resumeButton, settingsButton, restartButton, menuButton })
                 UIFactory.SetLayoutHeight(button, 110f);
 
-            settings = SettingsPanel.Create(canvas.transform, () => UIFactory.Select(resumeButton));
+            // The pause panel hides while settings are open, so the two never show through each other.
+            settings = SettingsPanel.Create(canvas.transform, () =>
+            {
+                pausePanel.gameObject.SetActive(true);
+                UIFactory.Select(resumeButton);
+            });
             root.gameObject.SetActive(false);
         }
 
         private void OpenSettings()
         {
+            pausePanel.gameObject.SetActive(false);
             settings.Show();
         }
 

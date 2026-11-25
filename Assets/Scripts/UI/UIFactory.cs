@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Com.MMsGamingCo.Core;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -111,7 +112,9 @@ namespace Com.MMsGamingCo.Ricomet
             layout.spacing = spacing;
             layout.childAlignment = alignment;
             layout.childControlWidth = true;
-            layout.childControlHeight = false;
+            // Rows take their height from LayoutElement (SetLayoutHeight). Without this every row
+            // falls back to 100 units and the list overlaps whatever sits below it.
+            layout.childControlHeight = true;
             layout.childForceExpandWidth = true;
             layout.childForceExpandHeight = false;
             return layout;
@@ -141,28 +144,44 @@ namespace Com.MMsGamingCo.Ricomet
 
         #region Graphics
 
-        /// <summary>Text in the theme font. Never blocks touches.</summary>
-        public static Text CreateText(Transform parent, string content, int fontSize, Color color, TextAnchor alignment, bool bold = true, bool glow = true)
+        /// <summary>Text in the theme's TextMeshPro font, with an optional neon glow. Never blocks touches.</summary>
+        public static TextMeshProUGUI CreateText(Transform parent, string content, int fontSize, Color color, TextAnchor alignment, bool bold = true, bool glow = true)
         {
             RectTransform rect = CreateRect("Text", parent);
-            Text text = rect.gameObject.AddComponent<Text>();
-            text.font = bold ? UITheme.Bold : UITheme.Medium;
+            TextMeshProUGUI text = rect.gameObject.AddComponent<TextMeshProUGUI>();
+            TMP_FontAsset font = bold ? UITheme.BoldFont : UITheme.MediumFont;
+            if (font != null) text.font = font;
             text.text = content;
             text.fontSize = fontSize;
             text.color = color;
-            text.alignment = alignment;
-            text.horizontalOverflow = HorizontalWrapMode.Wrap;
-            text.verticalOverflow = VerticalWrapMode.Overflow;
+            text.alignment = ToTextAlignment(alignment);
+            text.textWrappingMode = TextWrappingModes.Normal;
+            text.overflowMode = TextOverflowModes.Overflow;
             text.raycastTarget = false;
 
-            // A soft colored outline reads as a neon glow.
             if (glow)
             {
-                Outline outline = rect.gameObject.AddComponent<Outline>();
-                outline.effectColor = new Color(color.r, color.g, color.b, 0.28f);
-                outline.effectDistance = new Vector2(2.5f, -2.5f);
+                Material glowMaterial = UITheme.GlowMaterial(font, color);
+                if (glowMaterial != null) text.fontSharedMaterial = glowMaterial;
             }
             return text;
+        }
+
+        /// <summary>uGUI-style anchor to the TextMeshPro equivalent.</summary>
+        public static TextAlignmentOptions ToTextAlignment(TextAnchor anchor)
+        {
+            switch (anchor)
+            {
+                case TextAnchor.UpperLeft: return TextAlignmentOptions.TopLeft;
+                case TextAnchor.UpperCenter: return TextAlignmentOptions.Top;
+                case TextAnchor.UpperRight: return TextAlignmentOptions.TopRight;
+                case TextAnchor.MiddleLeft: return TextAlignmentOptions.Left;
+                case TextAnchor.MiddleRight: return TextAlignmentOptions.Right;
+                case TextAnchor.LowerLeft: return TextAlignmentOptions.BottomLeft;
+                case TextAnchor.LowerCenter: return TextAlignmentOptions.Bottom;
+                case TextAnchor.LowerRight: return TextAlignmentOptions.BottomRight;
+                default: return TextAlignmentOptions.Center;
+            }
         }
 
         /// <summary>An image. Pass raycastTarget true only for things that should block touches.</summary>
@@ -220,7 +239,7 @@ namespace Com.MMsGamingCo.Ricomet
             colors.colorMultiplier = 2f;
             button.colors = colors;
 
-            Text text = CreateText(fill.transform, label, fontSize, color, TextAnchor.MiddleCenter);
+            TextMeshProUGUI text = CreateText(fill.transform, label, fontSize, color, TextAnchor.MiddleCenter);
             Stretch(text.rectTransform);
 
             button.onClick.AddListener(() => GameAudio.Play(GameAudio.UiClick, 0.6f, 0f));
@@ -235,9 +254,9 @@ namespace Com.MMsGamingCo.Ricomet
         public static Slider CreateSlider(Transform parent, string label, float value, UnityAction<float> onChanged)
         {
             RectTransform row = CreateRect("Slider " + label, parent);
-            SetLayoutHeight(row, 80f);
+            SetLayoutHeight(row, 76f);
 
-            Text text = CreateText(row, label, 34, UITheme.White, TextAnchor.MiddleLeft, false, false);
+            TextMeshProUGUI text = CreateText(row, label, 34, UITheme.White, TextAnchor.MiddleLeft, false, false);
             text.rectTransform.anchorMin = new Vector2(0f, 0f);
             text.rectTransform.anchorMax = new Vector2(0.38f, 1f);
             text.rectTransform.offsetMin = Vector2.zero;
@@ -280,7 +299,7 @@ namespace Com.MMsGamingCo.Ricomet
         public static Toggle CreateToggle(Transform parent, string label, bool value, UnityAction<bool> onChanged)
         {
             RectTransform row = CreateRect("Toggle " + label, parent);
-            SetLayoutHeight(row, 80f);
+            SetLayoutHeight(row, 76f);
 
             Image box = CreatePanel(row, UITheme.Cyan, UITheme.PanelFill, true);
             box.rectTransform.anchorMin = new Vector2(0f, 0.5f);
@@ -295,7 +314,7 @@ namespace Com.MMsGamingCo.Ricomet
             check.rectTransform.offsetMin = Vector2.zero;
             check.rectTransform.offsetMax = Vector2.zero;
 
-            Text text = CreateText(row, label, 34, UITheme.White, TextAnchor.MiddleLeft, false, false);
+            TextMeshProUGUI text = CreateText(row, label, 34, UITheme.White, TextAnchor.MiddleLeft, false, false);
             text.rectTransform.anchorMin = Vector2.zero;
             text.rectTransform.anchorMax = Vector2.one;
             text.rectTransform.offsetMin = new Vector2(90f, 0f);

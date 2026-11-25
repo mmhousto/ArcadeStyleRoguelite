@@ -3,7 +3,8 @@
     "rootNamespace": "Com.MMsGamingCo.Ricomet",
     "references": [
         "MMsGamingCo.Core",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

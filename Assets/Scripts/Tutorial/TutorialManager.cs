@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 namespace Com.MMsGamingCo.Ricomet
@@ -24,7 +25,7 @@ namespace Com.MMsGamingCo.Ricomet
         private float doneTimer = 0f;
         private UnityEngine.UI.Image panel;
         private UnityEngine.UI.Image panelFrame;
-        private UnityEngine.UI.Text headerText, hintText;
+        private TMPro.TextMeshProUGUI headerText, hintText;
 
         #endregion
 
@@ -100,7 +101,7 @@ namespace Com.MMsGamingCo.Ricomet
             headerText.gameObject.SetActive(showHint);
             hintText.text = showHint ? sequence.Current.text : doneText;
             hintText.color = showHint ? UITheme.White : UITheme.Yellow;
-            hintText.alignment = showHint ? TextAnchor.MiddleLeft : TextAnchor.MiddleCenter;
+            hintText.alignment = showHint ? TMPro.TextAlignmentOptions.Left : TMPro.TextAlignmentOptions.Center;
             // "Nice!" floats on its own, without the panel behind it.
             panel.enabled = showHint;
             if (panelFrame != null) panelFrame.enabled = showHint;

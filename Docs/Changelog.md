@@ -28,6 +28,14 @@ Versions are 0.x during development; 1.0 is launch. Each version has its own `v<
   `Haptics.Impact` with a native hook.
 - Tests check every upgrade has an icon, every sound has a file, and the font is present.
 
+**Fixes after first look:**
+- All UI text uses the TextMeshPro Orbitron font assets, with a per-color glow material.
+- Menu lists no longer overlap: rows now take their set height (they were all 100 units).
+  Settings puts Replay Tutorial and Back side by side at the bottom.
+- Settings opened from pause hides the pause menu instead of showing through it.
+- HUD moved off the arena: the camera reserves a top band (shields, score, combo, wave,
+  pause) and a bottom band (upgrade icons, boss bar), including the iPhone safe-area inset.
+
 ## 0.4: Playtest bot and tutorial
 
 **Fixes after playtesting** (players and the bot all died inside the Prism):
